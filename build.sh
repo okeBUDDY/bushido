@@ -686,7 +686,8 @@ select_library_recipe() {
             R_CC1="$TOOL_CC1_6"; R_CC1OS="$TOOLOS_CC1_6"; R_CFLAGS='-O2 -G0'; R_AS="$TOOL_AS_7"; R_ASOS="$TOOLOS_AS_7"; R_DIV=yes; R_PFLAG=no
             ;;
         *)
-            R_CC1="$TOOL_CC1_4"; R_CC1OS="$TOOLOS_CC1_4"; R_CFLAGS='-O2 -G8'; R_AS="$TOOL_AS_5"; R_ASOS="$TOOLOS_AS_5"; R_DIV=yes; R_PFLAG=no
+            echo "error: no compiled library recipe for $_lib" >&2
+            exit 1
             ;;
     esac
 }

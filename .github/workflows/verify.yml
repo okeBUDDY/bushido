@@ -1,0 +1,166 @@
+# Verification and progress-report workflow generated from this repository's build tables.
+# Two modes:
+#   1. CI-verified build: when repository secret CI_INPUTS_SSH_KEY (read-only deploy key)
+#      and repository variable CI_INPUTS_REPO (owner/private-inputs-repo) are configured,
+#      checks out the private toolchain and retail inputs outside the source checkout,
+#      runs build.sh to every executable's SHA-256, deletes the inputs, and uploads the
+#      verified objdiff report(s).
+#   2. Committed-report fallback (non-fork repository without private inputs configured):
+#      publishes the committed objdiff report(s) exported from a verified local build.sh
+#      run and states plainly in the job summary that this run did not compile in CI.
+# On forks without secrets, the job exits cleanly with a notice and uploads nothing.
+name: Verify Build
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      HAVE_INPUTS: ${{ secrets.CI_INPUTS_SSH_KEY != '' && vars.CI_INPUTS_REPO != '' }}
+      IS_FORK: ${{ github.event.repository.fork }}
+    steps:
+      - name: Skip on fork without private inputs
+        if: env.HAVE_INPUTS != 'true' && env.IS_FORK == 'true'
+        run: |
+          echo "::notice::CI_INPUTS_REPO / CI_INPUTS_SSH_KEY are not configured on this fork; skipping verification and report upload."
+          {
+            echo "## Verification skipped (fork)"
+            echo ""
+            echo "Private toolchain and retail executable inputs are not configured on this fork. No build ran and no report artifact was uploaded."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Checkout repository
+        if: env.HAVE_INPUTS == 'true' || env.IS_FORK != 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: repo
+          persist-credentials: false
+
+      - name: Checkout private build inputs
+        if: env.HAVE_INPUTS == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ vars.CI_INPUTS_REPO }}
+          ssh-key: ${{ secrets.CI_INPUTS_SSH_KEY }}
+          path: inputs
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Install pinned tool runners
+        if: env.HAVE_INPUTS == 'true'
+        run: |
+          set -eu
+          mkdir -p "$RUNNER_TEMP/bin"
+          curl -fsSL "https://github.com/decompals/wibo/releases/download/1.2.0/wibo-x86_64" -o "$RUNNER_TEMP/bin/wibo"
+          printf '%s  %s\n' '13f86a2d618f0dbe67179d349625345eabf9b46450295cb4c904e49f6aff85af' "$RUNNER_TEMP/bin/wibo" | sha256sum -c -
+          chmod +x "$RUNNER_TEMP/bin/wibo"
+          cat > "$RUNNER_TEMP/bin/wibo-run" <<'EOF'
+          #!/bin/sh
+          set -eu
+          exe="$1"; shift
+          case "$(basename "$exe" | tr '[:upper:]' '[:lower:]')" in
+              asmpsx.exe)
+                  if [ "$#" -eq 1 ]; then
+                      case "$1" in
+                          @*)
+                              rsp="${1#@}"
+                              ln -sfn "$rsp" "$rsp "
+                              rc=0
+                              "$WIBO_BIN" "$exe" "$1" || rc=$?
+                              rm -f "$rsp "
+                              exit "$rc"
+                              ;;
+                      esac
+                  fi
+                  ;;
+          esac
+          exec "$WIBO_BIN" "$exe" "$@"
+          EOF
+          chmod +x "$RUNNER_TEMP/bin/wibo-run"
+          curl -fsSL "https://github.com/mkst/daze/releases/download/0.3.1/daze" -o "$RUNNER_TEMP/bin/daze"
+          printf '%s  %s\n' '7de972952a41db40ba05d3c37912b47f5779be8c61b093081085aed15a98b26f' "$RUNNER_TEMP/bin/daze" | sha256sum -c -
+          chmod +x "$RUNNER_TEMP/bin/daze"
+          cat > "$RUNNER_TEMP/bin/daze-run" <<'EOF'
+          #!/bin/sh
+          set -eu
+          exe="$1"; shift
+          exec "$DAZE_BIN" --mount "C:." --mount-ro "D:$(dirname "$exe")" "D:$(basename "$exe")" "$@"
+          EOF
+          chmod +x "$RUNNER_TEMP/bin/daze-run"
+
+      - name: Build and verify executables
+        if: env.HAVE_INPUTS == 'true'
+        working-directory: repo
+        env:
+          WIBO_BIN: ${{ runner.temp }}/bin/wibo
+          WIN32_RUNNER: ${{ runner.temp }}/bin/wibo-run
+          DAZE_BIN: ${{ runner.temp }}/bin/daze
+          DOS_RUNNER: ${{ runner.temp }}/bin/daze-run
+          PSYQ_3_6: ${{ github.workspace }}/inputs/psyq-3.6
+          PSYQ_3_3_DOS: ${{ github.workspace }}/inputs/psyq-3.3-dos
+          PSYQ_3_5_DOS: ${{ github.workspace }}/inputs/psyq-3.5-dos
+          PSYQ_3_6_DOS: ${{ github.workspace }}/inputs/psyq-3.6-dos
+          ORIG_DIR: ${{ github.workspace }}/inputs/orig
+        run: |
+          set -eu
+          sh build.sh --build-dir "$RUNNER_TEMP/build" --report "$RUNNER_TEMP/reports"
+          {
+            echo "## CI-verified build"
+            echo ""
+            echo "Built from this commit with the original toolchain and verified every executable's SHA-256 via \`build.sh\`."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Stage committed report (private inputs not configured)
+        if: env.HAVE_INPUTS != 'true' && env.IS_FORK != 'true'
+        run: |
+          set -eu
+          mkdir -p "$RUNNER_TEMP/reports"
+          cp "repo/config/bushidoblade/reports/SCUS_941.80.json" "$RUNNER_TEMP/reports/SCUS_941.80.json"
+          cp "repo/config/bushidoblade/reports/SLPM_860.20.json" "$RUNNER_TEMP/reports/SLPM_860.20.json"
+          cp "repo/config/bushidoblade/reports/SCES_008.99.json" "$RUNNER_TEMP/reports/SCES_008.99.json"
+          echo "::notice::CI_INPUTS_REPO / CI_INPUTS_SSH_KEY are not configured; publishing committed report without compiling in CI."
+          {
+            echo "## Committed report (not compiled in CI)"
+            echo ""
+            echo "Private toolchain and retail executable inputs (\`CI_INPUTS_REPO\` / \`CI_INPUTS_SSH_KEY\`) are not configured on this repository."
+            echo "This run did **not** compile the source in CI; it published the committed objdiff report(s) exported from a verified local \`build.sh\` run."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Remove private inputs and build intermediates
+        if: always()
+        run: rm -rf "${{ github.workspace }}/inputs" "${{ runner.temp }}/build"
+
+      - name: Upload SCUS_941.80 report
+        if: env.HAVE_INPUTS == 'true' || env.IS_FORK != 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: SCUS_941.80_report
+          path: ${{ runner.temp }}/reports/SCUS_941.80.json
+          if-no-files-found: error
+
+      - name: Upload SLPM_860.20 report
+        if: env.HAVE_INPUTS == 'true' || env.IS_FORK != 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: SLPM_860.20_report
+          path: ${{ runner.temp }}/reports/SLPM_860.20.json
+          if-no-files-found: error
+
+      - name: Upload SCES_008.99 report
+        if: env.HAVE_INPUTS == 'true' || env.IS_FORK != 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: SCES_008.99_report
+          path: ${{ runner.temp }}/reports/SCES_008.99.json
+          if-no-files-found: error

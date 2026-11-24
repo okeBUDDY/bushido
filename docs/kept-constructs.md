@@ -93,7 +93,7 @@ A test or loop the compiler removes whose presence still shapes the code around 
 - `src/lib/snd/tempo.c`, `_SsSndTempo`: `if (score->tempo < score->tempo_target) { score->tempo = score->tempo_target; }`
   Both clamps of score->tempo to score->tempo_target are live code: the original makes the first clamp's comparison and then jumps into the second clamp's branch and store, which the two share, so the first clamp has no store of its own.
 
-A declaration or form the original's code needs, found by a reader who tried the plainer ones. (2)
+A declaration or form the original's code needs: each plainer one tried compiles differently. (2)
 
 - `src/fighter_cloth.c`, at file scope: `short gClothWeightsDemoRedShadow[88] = {`
   The empty weight list every character without cloth shares is the tail of gClothWeightsDemoRedShadow, because as its own object the list is 4 bytes, which the compiler places in small data, moving the data after it.

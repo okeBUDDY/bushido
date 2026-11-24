@@ -202,3 +202,5 @@ picture, and states those by hash:
 With exactly these tools and inputs, the source was built into the three executables, and each has its retail
 executable's SHA-256 (listed in the [README](../README.md)). Four of the tools are DOS programs (ASPSX 2.21,
 PSYLINK 2.27, CC1PSX 2.6.0 and ASPSX 2.34), the others Win32 programs; how to run them is the reader's choice.
+The repository's own workflow (`.github/workflows/verify.yml`) runs `build.sh` on Linux, the Win32 tools with
+`wibo` and the DOS tools with `daze`, each checked by SHA-256.

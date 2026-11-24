@@ -79,6 +79,12 @@ It needs only a POSIX shell with its standard utilities and `sha256sum` or `shas
 every variable and option. A run that reproduces all three executables ends with
 `Verified 3 executable(s) cleanly.`; any input or result whose SHA-256 differs stops it with an error.
 
+`.github/workflows/verify.yml` runs the same script on a hosted Linux runner at each push to `master` and
+publishes each executable's match report once all three SHA-256 checks pass. It runs the Win32 tools with `wibo`
+and the DOS tools with `daze`, two freely available runners, each checked by SHA-256: one way to run `build.sh`
+off Windows. The kit and the retail executables come from a private repository; a fork without them builds
+nothing.
+
 ## Layout
 
 | Path | Holds |
