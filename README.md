@@ -47,7 +47,7 @@ one MODE2/2352 data track:
 
 ## The build
 
-This repository holds no file of the game or of Sony's development kit, and no build scripts. It states the
+This repository holds no file of the game or of Sony's development kit. It states the
 build as facts: each tool by name, version and SHA-256, the options each part is compiled and assembled with,
 the link order, the kit's headers by SHA-256, and each executable's SHA-256
 ([docs/building.md](docs/building.md) and the tables in `config/bushidoblade/`). With exactly those tools, this
@@ -59,6 +59,14 @@ headers. One array the source includes is not in the tree: the loading-screen pi
 `src/font_hud.c` includes from the reader's own executable (`config/bushidoblade/assets.tsv` gives its address,
 size and SHA-256 in each build). Several of the tools are DOS programs of 1994 and 1995; how to run them is
 the reader's choice.
+
+### Verifying with `build.sh`
+
+`build.sh` is a standalone POSIX shell script generated from the tables in `config/bushidoblade/`. Point it at
+your copies of the four PsyQ kit releases (`PSYQ_3_6`, `PSYQ_3_3_DOS`, `PSYQ_3_5_DOS`, `PSYQ_3_6_DOS`, or
+`PSYQ_ROOTS`), your retail executables (`SCUS_EXE`, `SLPM_EXE`, `SCES_EXE`, or `ORIG_DIR`), and a `DOS_RUNNER`
+(plus `WIN32_RUNNER` off Windows), then run `sh build.sh`. It verifies every tool and SDK header by SHA-256,
+compiles all 12 libraries and 103 game units from source, links all three executables, and checks each SHA-256.
 
 ## Layout
 

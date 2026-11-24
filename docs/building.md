@@ -2,8 +2,8 @@
 
 Bushido Blade was built with SN Systems' PsyQ development kit and Sony's Runtime Library 3.6. The tree is built
 with the same tools, each named below with the evidence that it is the one the game was built with; Sony's
-libraries are built from the decompiled modules in `src/lib`; one link input is not source. The tree holds no
-build scripts, only the build as facts (the last section lists them).
+libraries are built from the decompiled modules in `src/lib`; one link input is not source. The build is
+stated as facts (the last section lists them), and `build.sh` runs them directly with the original tools.
 
 ## The pipeline
 
