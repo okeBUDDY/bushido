@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <libgte.h>
 #include <libgpu.h>
+#include "int32.h"
 
 typedef struct EffectTextureEntry {
     unsigned char u, v;
@@ -58,7 +59,7 @@ typedef struct SpriteDesc {
     short height;
     short frameCount;            /* ticks */
     short pad;
-    u_long colorAndCode;
+    u32 colorAndCode;
     u_short (*uvs)[4];           /* per frame, four corners, each u | v << 8 */
     u_char *frames;              /* frame of each tick */
     EffectTextureEntry *texture;
@@ -73,7 +74,7 @@ typedef struct BillboardEffectWork {
     int cameraAngle;
     SVECTOR corners[4];
     VECTOR delta;
-    long *depths;
+    s32 *depths;
     POLY_FT4 **prims;
 } BillboardEffectWork;
 

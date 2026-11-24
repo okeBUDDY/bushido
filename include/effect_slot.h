@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <libetc.h>
 #include <libgte.h>
+#include "int32.h"
 
 #define EFFECT_POOL_SIZE 24
 
@@ -60,7 +61,7 @@ typedef struct EffectType {
 typedef struct EffectQuad {
     union {
         CVECTOR color;
-        u_long rgbc;
+        u32 rgbc;
     } tint;
     u_char u0, v0;
     u_short clut;

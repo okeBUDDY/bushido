@@ -6,6 +6,7 @@
 #include <rand.h>
 #include <inline_o.h>
 
+#include "int32.h"
 #include "cloth.h"
 #include "foliage.h"
 #include "gpu_code.h"
@@ -147,14 +148,14 @@ int UpdateAndDrawSwayingFoliage(SwayingFoliageScratch *scratch)
 {
     ClothItem items[SWAYING_FOLIAGE_COUNT];
     SwayingFoliageScratch savedScratch;
-    long depths[SWAYING_FOLIAGE_QUAD_COUNT];
+    s32 depths[SWAYING_FOLIAGE_QUAD_COUNT];
     POLY_FT4 *polys[SWAYING_FOLIAGE_QUAD_COUNT];
     SwayingFoliageBody *body;
     SwayingFoliageTexture *texture;
     short *quadVerts;
     VECTOR *origin;
     POLY_FT4 *poly;
-    long *depthList;
+    s32 *depthList;
     int savedWindStrength;
     int windWave;
     int rgbCode;
@@ -218,7 +219,7 @@ int UpdateAndDrawSwayingFoliage(SwayingFoliageScratch *scratch)
             gte_rtps();
             poly->tpage = texture->tpage;
             poly->clut = texture->clut;
-            *(long *)&poly->r0 = rgbCode;
+            *(s32 *)&poly->r0 = rgbCode;
             gte_stsxy(&poly->x3);
             gte_avsz4();
             *(unsigned short *)&poly->u0 = texture->uv[quadVerts[0]];
@@ -231,7 +232,7 @@ int UpdateAndDrawSwayingFoliage(SwayingFoliageScratch *scratch)
     }
 
     scratch->packetCursor = poly;
-    depthList = (long *)poly + polyCount;
+    depthList = (s32 *)poly + polyCount;
     for (deferredIndex = 0; deferredIndex < polyCount; deferredIndex++)
         ((POLY_FT4 **)poly)[deferredIndex] = polys[deferredIndex];
     for (deferredIndex = 0; deferredIndex < polyCount; deferredIndex++)

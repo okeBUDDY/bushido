@@ -5,9 +5,10 @@
 
 #include <sys/types.h>
 #include <libgte.h>
+#include "int32.h"
 #include "scene_node.h"
 
-void UpdateAndEnqueueFighterPose(int side, int mode, long *position,
+void UpdateAndEnqueueFighterPose(int side, int mode, s32 *position,
                                  PoseAngles *rotation, PoseAngles *poseAngles, int floorY);
 void BlendPoseJointRotations(int side, PoseAngles *fromPose, PoseAngles *toPose,
                              int weight, MATRIX *scratch);
@@ -17,7 +18,7 @@ struct SceneNode *LoadSingleFighterSlot(int side, int modelId, int weaponId,
                                         struct SceneNode *skeletonParts, struct SceneNode *shadowParts,
                                         int reloadTextures);
 MATRIX **GetFighterWorldMatrixList(int side);
-long *GetFighterRootJointLocalPos(int side);
+s32 *GetFighterRootJointLocalPos(int side);
 struct SceneNode *GetFighterRootNode(int side);
 void TintSlashEnemyCluts(int red, int green, int blue);
 void RemoveWeaponShadowPart(int side);

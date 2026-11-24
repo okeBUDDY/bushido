@@ -1,11 +1,12 @@
 /* Root counter 1, counting horizontal blanks, free running. 0xf2000001 is kernel.h's RCntCNT1 and
  * 0x2000 its RCntMdNOINTR, written as numbers because kernel.h is not included (SetRCnt below). */
 
+#include "int32.h"
 #include "timer.h"
 
-long SetRCnt(); /* not kernel.h's prototype: the original passes the target -1 as an int */
-long StartRCnt(unsigned long spec);
-long GetRCnt(unsigned long spec);
+s32 SetRCnt(); /* not kernel.h's prototype: the original passes the target -1 as an int */
+s32 StartRCnt(u32 spec);
+s32 GetRCnt(u32 spec);
 
 void InitHBlankRootCounter(void)
 {

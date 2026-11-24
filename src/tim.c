@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include <libgte.h>
 #include <libgpu.h>
+#include "int32.h"
 #include "globals.h"
 #include "tim.h"
 
@@ -15,8 +16,8 @@ typedef struct TextureInfo {
     short x, y, width, height;
     short clutX, clutY, clutWidth, clutHeight;
     unsigned short tpage, clut;
-    unsigned long *pixels;
-    unsigned long *palette;
+    u32 *pixels;
+    u32 *palette;
 } TextureInfo;
 
 /* TIM group archive layout: leading table of byte offsets to each group; each group holds a
@@ -26,24 +27,24 @@ void LoadTimGroup(cursor, groupIndex)
     short groupIndex;
 {
     TextureInfo info; /* not used */
-    unsigned long *base;
-    unsigned long groupOffset;
-    unsigned long count;
+    u32 *base;
+    u32 groupOffset;
+    u32 count;
 
-    base = (unsigned long *)cursor;
-    cursor = (unsigned short *)((unsigned long *)cursor + groupIndex);
-    groupOffset = *(unsigned long *)cursor;
+    base = (u32 *)cursor;
+    cursor = (unsigned short *)((u32 *)cursor + groupIndex);
+    groupOffset = *(u32 *)cursor;
     cursor = (unsigned short *)(base + groupOffset / sizeof(*base));
-    count = *(unsigned long *)cursor;
+    count = *(u32 *)cursor;
     cursor += 2;
 
     if (count != 0) {
         while (count-- > 0) {
-            unsigned long timOffset;
-            unsigned long *tim;
+            u32 timOffset;
+            u32 *tim;
             unsigned short x, y, clutX, clutY;
 
-            timOffset = *(unsigned long *)cursor;
+            timOffset = *(u32 *)cursor;
             cursor += 2;
             tim = base + timOffset / sizeof(*base);
             x = *cursor++;
@@ -58,12 +59,12 @@ void LoadTimGroup(cursor, groupIndex)
 void LoadTimGroupWithOffset(const void *cursor, int groupIndex, int xOffset, int yOffset)
 {
     TextureInfo info; /* not used */
-    const unsigned long *base = cursor;
+    const u32 *base = cursor;
     unsigned int count;
     unsigned int groupOffset;
 
-    cursor = (const unsigned long *)cursor + (short)groupIndex;
-    groupOffset = *(unsigned long *)cursor;
+    cursor = (const u32 *)cursor + (short)groupIndex;
+    groupOffset = *(u32 *)cursor;
     cursor = base + groupOffset / sizeof(*base);
     count = *(const unsigned int *)cursor;
     cursor = (const unsigned short *)cursor + 2;
@@ -71,12 +72,12 @@ void LoadTimGroupWithOffset(const void *cursor, int groupIndex, int xOffset, int
     if (count != 0) {
         while (count-- > 0) {
             unsigned int timOffset;
-            unsigned long *tim;
+            u32 *tim;
             unsigned short x, y, clutX, clutY;
 
             timOffset = *(const unsigned int *)cursor;
             cursor = (const unsigned short *)cursor + 2;
-            tim = (unsigned long *)(base + timOffset / sizeof(*base));
+            tim = (u32 *)(base + timOffset / sizeof(*base));
             x = *(const unsigned short *)cursor;
             cursor = (const unsigned short *)cursor + 1;
             y = *(const unsigned short *)cursor;
@@ -96,12 +97,12 @@ void LoadTimGroupWithSeparateOffsets(const void *cursor, int groupIndex, int xOf
                                      int clutXOffset, int clutYOffset)
 {
     TextureInfo info; /* not used */
-    const unsigned long *base = cursor;
+    const u32 *base = cursor;
     unsigned int count;
     unsigned int groupOffset;
 
-    cursor = (const unsigned long *)cursor + (short)groupIndex;
-    groupOffset = *(unsigned long *)cursor;
+    cursor = (const u32 *)cursor + (short)groupIndex;
+    groupOffset = *(u32 *)cursor;
     cursor = base + groupOffset / sizeof(*base);
     count = *(const unsigned int *)cursor;
     cursor = (const unsigned short *)cursor + 2;
@@ -109,12 +110,12 @@ void LoadTimGroupWithSeparateOffsets(const void *cursor, int groupIndex, int xOf
     if (count != 0) {
         while (count-- > 0) {
             unsigned int timOffset;
-            unsigned long *tim;
+            u32 *tim;
             unsigned short x, y, clutX, clutY;
 
             timOffset = *(const unsigned int *)cursor;
             cursor = (const unsigned short *)cursor + 2;
-            tim = (unsigned long *)(base + timOffset / sizeof(*base));
+            tim = (u32 *)(base + timOffset / sizeof(*base));
             x = *(const unsigned short *)cursor;
             cursor = (const unsigned short *)cursor + 1;
             y = *(const unsigned short *)cursor;
@@ -132,18 +133,18 @@ void LoadTimGroupWithSeparateOffsets(const void *cursor, int groupIndex, int xOf
 }
 
 void UploadTimToVram(tim, x, y, clutX, clutY)
-    u_long *tim;
+    u32 *tim;
     int x;
     int y;
     short clutX;
     unsigned short clutY;
 {
-    u_long *clut;
+    u32 *clut;
     unsigned int magic;
     unsigned int hasClut;
-    u_long dimensions;
+    u32 dimensions;
     RECT rect;
-    u_long converted[256];
+    u32 converted[256];
 
     magic = *(u_char *)tim;
     ++tim;
@@ -210,17 +211,17 @@ void LoadTimClutGroupWithOffset(const void *cursor, int groupIndex, int xOffset,
             cursor = (const unsigned short *)cursor + 1;
             clutY = *(const unsigned short *)cursor;
             cursor = (const unsigned short *)cursor + 1;
-            UploadTimClutToVram((unsigned long *)(base + timOffset), (short)clutX + (short)xOffset,
+            UploadTimClutToVram((u32 *)(base + timOffset), (short)clutX + (short)xOffset,
                                 (short)clutY + (short)yOffset);
         }
     }
 }
 
-void UploadTimClutToVram(unsigned long *tim, int x, int y)
+void UploadTimClutToVram(u32 *tim, int x, int y)
 {
     RECT rect;
-    unsigned long clut[256];
-    unsigned long dimensions;
+    u32 clut[256];
+    u32 dimensions;
 
     if (*(unsigned char *)tim == TIM_ID) {
         tim++;
@@ -243,7 +244,7 @@ void UploadTimClutToVram(unsigned long *tim, int x, int y)
     }
 }
 
-static void ReadTimTextureInfo(unsigned long *tim, TextureInfo *out,
+static void ReadTimTextureInfo(u32 *tim, TextureInfo *out,
                                short x, short y, short clutX, short clutY);
 
 /* Nothing calls it. */
@@ -270,7 +271,7 @@ static int GetTimGroupEntryInfo(void *cursor, int groupIndex, unsigned int entry
         cursor = (unsigned char *)cursor + 2;
         clutY = *(unsigned short *)cursor;
 
-        ReadTimTextureInfo((unsigned long *)(timOffset + base), out, (short)x, (short)y, clutX, clutY);
+        ReadTimTextureInfo((u32 *)(timOffset + base), out, (short)x, (short)y, clutX, clutY);
         result = count;
     } else {
         result = -1;
@@ -279,18 +280,18 @@ static int GetTimGroupEntryInfo(void *cursor, int groupIndex, unsigned int entry
 }
 
 /* Reached only from GetTimGroupEntryInfo, which nothing calls. */
-static void ReadTimTextureInfo(unsigned long *tim, TextureInfo *out, short x, short y,
+static void ReadTimTextureInfo(u32 *tim, TextureInfo *out, short x, short y,
                         short clutX, short clutY)
 {
-    unsigned long flags, width;
+    u32 flags, width;
     unsigned short height;
-    unsigned long *block;
+    u32 *block;
 
     if (*(unsigned char *)tim++ == TIM_ID) {
         flags = *tim++;
         out->mode = flags & TIM_MODE_MASK;
         if (flags & TIM_HAS_CLUT) {
-            unsigned long size;
+            u32 size;
 
             block = tim;
             size = *block;
@@ -385,7 +386,7 @@ void TintVramClut(int mode, int sourceX, int sourceY, int count, int rScale, int
     rect.y = sourceY;
     rect.w = count;
     rect.h = 1;
-    StoreImage(&rect, (u_long *)source);
+    StoreImage(&rect, (u32 *)source);
     DrawSync(0);
 
     sourcePtr = source;
@@ -425,7 +426,7 @@ void TintVramClut(int mode, int sourceX, int sourceY, int count, int rScale, int
 
     rect.x = destX;
     rect.y = destY;
-    LoadImage(&rect, (u_long *)dest);
+    LoadImage(&rect, (u32 *)dest);
     DrawSync(0);
 }
 

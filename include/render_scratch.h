@@ -3,6 +3,7 @@
 
 #include <libetc.h>
 #include <libgpu.h>
+#include "int32.h"
 
 /* Stage-tile near-clip compressed OTZ thresholds tested in RenderSceneDisplayList. */
 #define STAGE_TILE_NEAR_CLIP_OTZ    0x182
@@ -17,12 +18,12 @@ typedef struct RenderScratch {
     SVECTOR *vertices;          /* +0x000: active mesh vertex buffer */
     int dispatchReturn;         /* +0x004: DispatchMeshPrimitiveGroups's return address (render.s) */
     int scaleShift;             /* +0x008: the drawers' depth shift, 3 less the node's coordinate shift */
-    u_long *orderingTable;      /* +0x00C: active frame reverse ordering table (gCurrentOt) */
+    u32 *orderingTable;         /* +0x00C: active frame reverse ordering table (gCurrentOt) */
     int fogFarOtz;              /* +0x010: far-clip OTZ limit from GetFogFarOtzBucket() */
     int doubleBufferMask;       /* +0x014: -1 on odd frames, 0 on even frames (selects packet bank) */
     int stageTileMinOtz;        /* +0x018: minimum compressed OTZ for stage tiles (0x182 or 1) */
     PrimRenderFn *primTable;    /* +0x01C: primitive rasterizer dispatch table (gPrimRenderDispatch) */
-    long screenXy[60];          /* +0x020 (0x1F800020): RotTransPers packed (sx, sy) */
+    s32 screenXy[60];           /* +0x020 (0x1F800020): RotTransPers packed (sx, sy) */
     unsigned short screenZ[60]; /* +0x110 (0x1F800110): ReadSZfifo3 screen Z depths */
 } RenderScratch;
 
@@ -45,12 +46,12 @@ typedef struct MeshScratch {
                                                  (the word of RenderScratch.vertices) */
     int dispatchReturn;                       /* +0x004: DispatchMeshPrimitiveGroups's return address */
     int scaleShift;                           /* +0x008: the drawers' depth shift */
-    u_long *orderingTable;                    /* +0x00C: active frame reverse ordering table */
+    u32 *orderingTable;                       /* +0x00C: active frame reverse ordering table */
     int fogFarOtz;                            /* +0x010: far-clip OTZ limit */
     int doubleBufferMask;                     /* +0x014: packet bank selector mask */
     int stageTileMinOtz;                      /* +0x018: stage tile near-clip OTZ */
     PrimRenderFn *primTable;                  /* +0x01C: primitive dispatch table */
-    long screenXy[MESH_SCRATCH_MAX_VERTICES]; /* +0x020 (0x1F800020): packed screen (sx, sy) */
+    s32 screenXy[MESH_SCRATCH_MAX_VERTICES];  /* +0x020 (0x1F800020): packed screen (sx, sy) */
     short screenZ[MESH_SCRATCH_MAX_VERTICES]; /* +0x2B4 (0x1F8002B4): screen Z depths */
 } MeshScratch;
 

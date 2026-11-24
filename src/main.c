@@ -8,6 +8,7 @@
 #include <libgpu.h>
 #include <rand.h>
 
+#include "int32.h"
 #include "api_int.h"
 #include "cd.h"
 #include "combat_state.h"
@@ -105,8 +106,8 @@ static void ResetGameOptions(void)
 /* Seeds the random generator with a checksum of the fighters' load area. Nothing calls it. */
 static void SeedRandomFromLoadArea(void)
 {
-    unsigned long sum = 0;
-    unsigned long *wordPtr = DYNAMIC_LOAD_BUFFER;
+    u32 sum = 0;
+    u32 *wordPtr = DYNAMIC_LOAD_BUFFER;
     unsigned int blockIndex;
 
     for (blockIndex = 0; blockIndex < SEED_CHECKSUM_QUADS; blockIndex++) {
@@ -197,7 +198,7 @@ void (*gGameStateHandlers[GAME_STATE_COUNT])() = {
 };
 
 int gFrameCounter;
-u_long *gCurrentOt;
+u32 *gCurrentOt;
 
 void main(void)
 {

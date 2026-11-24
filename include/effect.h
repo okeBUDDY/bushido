@@ -3,6 +3,7 @@
 
 #include <sys/types.h>
 #include <libgte.h>
+#include "int32.h"
 #include "effect_slot.h"
 
 void ClearEffectPool(void);
@@ -11,7 +12,7 @@ void UpdateAndDrawEffects(void);
 EffectSlot *AllocEffectSlot(void);
 int *DrawEffectMesh(int *meshData);
 int SetupEffectTransform(int mode, int x, int y, int z);
-void SpawnEffect(int type, long x, long y, long z);
+void SpawnEffect(int type, s32 x, s32 y, s32 z);
 void UpdateSpriteEffect(EffectSlot *effect);
 void SpawnStage4LightGlows(void);
 void UpdateStage4LightGlow(EffectSlot *effect);

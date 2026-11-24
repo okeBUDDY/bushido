@@ -5,19 +5,20 @@
 #include <libgte.h>
 #include <libgpu.h>
 
+#include "int32.h"
 #include "billboard.h"
 
 /* UpdateAndBuildGroundDecals's working record in the scratchpad (render_scratch.h): the half-height
  * camera matrix in, the packet cursor in and out (the deferred packet list and depths follow it). */
 typedef struct GroundDecalScratch {
     MATRIX matrix;
-    long translation[3];
+    s32 translation[3];
     int unused0; /* 4 bytes nothing reads or writes */
     POLY_FT4 *packets;
     int unused1; /* 4 bytes nothing reads or writes */
     SVECTOR corners[4];
     int unused2[3]; /* 12 bytes nothing reads or writes */
-    long opz;
+    s32 opz;
 } GroundDecalScratch;
 
 extern EffectTextureEntry gGroundDecalTexture;

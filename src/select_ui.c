@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <libgte.h>
 #include <libgpu.h>
+#include "int32.h"
 #include "display_buffer.h"
 #include "gpu_code.h"
 #include "packet_build.h"
@@ -831,7 +832,7 @@ void UpdateAndDrawWeaponConfirmStamp(int side)
     }
 }
 
-#define SCREEN_XY(v) ((unsigned short)(v).vx | ((unsigned long)(v).vy << 16))
+#define SCREEN_XY(v) ((unsigned short)(v).vx | ((u32)(v).vy << 16))
 
 void DrawRotatedTexturedQuad(RotatedTexturedQuad *quad, int rx, int ry, int rz, int x, int y)
 {
@@ -839,8 +840,8 @@ void DrawRotatedTexturedQuad(RotatedTexturedQuad *quad, int rx, int ry, int rz, 
     VECTOR screen[4];
     MATRIX matrix;
     POLY_FT4 *poly = gPacketCursor;
-    long *attrs = (long *)quad;
-    unsigned long *ot;
+    s32 *attrs = (s32 *)quad;
+    u32 *ot;
     int i;
 
     angles.vx = rx;
@@ -860,17 +861,17 @@ void DrawRotatedTexturedQuad(RotatedTexturedQuad *quad, int rx, int ry, int rz, 
     } while (++i < 4);
 
     setlen(poly, 9);
-    *(u_long *)&poly->r0 = attrs[0];
-    *(u_long *)&poly->u0 = attrs[1];
-    *(u_long *)&poly->u1 = attrs[2];
+    *(u32 *)&poly->r0 = attrs[0];
+    *(u32 *)&poly->u0 = attrs[1];
+    *(u32 *)&poly->u1 = attrs[2];
     *(u_short *)&poly->u2 = attrs[3];
     *(u_short *)&poly->u3 = attrs[3] >> 16;
 
     ot = gCurrentOt;
-    *(u_long *)&poly->x0 = SCREEN_XY(screen[0]);
-    *(u_long *)&poly->x1 = SCREEN_XY(screen[1]);
-    *(u_long *)&poly->x2 = SCREEN_XY(screen[2]);
-    *(u_long *)&poly->x3 = SCREEN_XY(screen[3]);
+    *(u32 *)&poly->x0 = SCREEN_XY(screen[0]);
+    *(u32 *)&poly->x1 = SCREEN_XY(screen[1]);
+    *(u32 *)&poly->x2 = SCREEN_XY(screen[2]);
+    *(u32 *)&poly->x3 = SCREEN_XY(screen[3]);
 
     AddPrim(ot, poly);
     ++poly;

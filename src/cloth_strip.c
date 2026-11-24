@@ -7,6 +7,7 @@
 #include <inline_o.h>
 #include <rand.h>
 
+#include "int32.h"
 #include "cloth.h"
 #include "cloth_strip.h"
 #include "gpu_code.h"
@@ -232,7 +233,7 @@ int UpdateAndDrawStageClothStrips(StageClothRenderContext *ctx)
     int index;
     int origin, row, col, cornerRow, cornerCol;
     int dx, dz;
-    long depth, mantissa;
+    s32 depth, mantissa;
 
     savedCtx = STAGE_CLOTH_SAVED_CTX;
     *savedCtx = *ctx;
@@ -289,8 +290,8 @@ int UpdateAndDrawStageClothStrips(StageClothRenderContext *ctx)
                 gte_stsxy3(&ctx->screen[0], &ctx->screen[1], &ctx->screen[2]);
                 gte_ldv0(&ctx->corner[3]);
                 gte_rtps();
-                *(long *)&packet->x0 = ctx->screen[0];
-                *(long *)&packet->x1 = ctx->screen[1];
+                *(s32 *)&packet->x0 = ctx->screen[0];
+                *(s32 *)&packet->x1 = ctx->screen[1];
                 gte_stsxy(&ctx->screen[3]);
                 gte_avsz4();
                 *(unsigned short *)&packet->u0 = texture->uv[index];
@@ -305,9 +306,9 @@ int UpdateAndDrawStageClothStrips(StageClothRenderContext *ctx)
                 if (ctx->work.draw.depth < OTZ_BUCKET_COUNT) {
                     gte_ldsxy3(ctx->screen[0], ctx->screen[1], ctx->screen[2]);
                     gte_nclip();
-                    *(long *)&packet->x2 = ctx->screen[2];
+                    *(s32 *)&packet->x2 = ctx->screen[2];
                     gte_stopz(&ctx->work.draw.normalSide);
-                    ctx->work.draw.normalSide = (unsigned long)ctx->work.draw.normalSide >> 31;
+                    ctx->work.draw.normalSide = (u32)ctx->work.draw.normalSide >> 31;
                     gte_ldv3(&mesh->normals[row][col].side[ctx->work.draw.normalSide],
                              &mesh->normals[row][col + 1].side[ctx->work.draw.normalSide],
                              &mesh->normals[row + 1][col].side[ctx->work.draw.normalSide]);
@@ -321,11 +322,11 @@ int UpdateAndDrawStageClothStrips(StageClothRenderContext *ctx)
                     SetPolyGT3(packet);
                     gte_ldsxy3(ctx->screen[2], ctx->screen[1], ctx->screen[3]);
                     gte_nclip();
-                    *(long *)&packet->x0 = ctx->screen[1];
-                    *(long *)&packet->x1 = ctx->screen[2];
-                    *(long *)&packet->x2 = ctx->screen[3];
+                    *(s32 *)&packet->x0 = ctx->screen[1];
+                    *(s32 *)&packet->x1 = ctx->screen[2];
+                    *(s32 *)&packet->x2 = ctx->screen[3];
                     gte_stopz(&ctx->work.draw.normalSide);
-                    ctx->work.draw.normalSide = (unsigned long)ctx->work.draw.normalSide >> 31;
+                    ctx->work.draw.normalSide = (u32)ctx->work.draw.normalSide >> 31;
                     gte_ldv3(&mesh->normals[row][col + 1].side[ctx->work.draw.normalSide],
                              &mesh->normals[row + 1][col].side[ctx->work.draw.normalSide],
                              &mesh->normals[row + 1][col + 1].side[ctx->work.draw.normalSide]);

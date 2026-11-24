@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include <libgte.h>
 #include <libgpu.h>
+#include "int32.h"
 #include "combat_state.h"
 #include <inline_o.h>
 #include "billboard.h"
@@ -133,7 +134,7 @@ int UpdateAndDrawBillboardEffect(BillboardEffectWork *work, BillboardEffectSlot 
     int row, col;
     int offset;
     int frame;
-    long *depths;
+    s32 *depths;
     POLY_FT4 **prims;
 
     prim = *nextPrim;
@@ -157,7 +158,7 @@ int UpdateAndDrawBillboardEffect(BillboardEffectWork *work, BillboardEffectSlot 
     gte_rtpt();
     SetPolyFT4(prim);
     prims[primCount] = prim;
-    *(u_long *)&prim->r0 = desc->colorAndCode;
+    *(u32 *)&prim->r0 = desc->colorAndCode;
     gte_stsxy3(&prim->x0, &prim->x1, &prim->x2);
     gte_ldv0(&work->corners[3]);
     gte_rtps();
@@ -546,14 +547,14 @@ BillboardEffectHandler gBillboardEffectHandlers[BILLBOARD_EFFECT_DELAYED_AMBIENT
 
 int UpdateAndBuildBillboardEffects(BillboardEffectWork *work)
 {
-    long depths[BILLBOARD_EFFECT_POOL_SIZE];
+    s32 depths[BILLBOARD_EFFECT_POOL_SIZE];
     POLY_FT4 *primitives[BILLBOARD_EFFECT_POOL_SIZE];
     POLY_FT4 *packets;
     BillboardEffectSlot *slot;
     int count;
     int i;
     int j;
-    long *depthList;
+    s32 *depthList;
 
     work->depths = depths;
     work->prims = primitives;
@@ -567,7 +568,7 @@ int UpdateAndBuildBillboardEffects(BillboardEffectWork *work)
             count = gBillboardEffectHandlers[slot->kind](work, slot, count, &packets);
     }
     work->packets = packets;
-    depthList = (long *)packets + count;
+    depthList = (s32 *)packets + count;
     for (j = 0; j < count; j++)
         ((POLY_FT4 **)packets)[j] = primitives[j];
     for (j = 0; j < count; j++)

@@ -5,6 +5,7 @@
 #include <libgpu.h>
 #include <rand.h>
 
+#include "int32.h"
 #include "effect_slot.h"
 #include "packet_build.h"
 #include "scene_node.h"
@@ -369,7 +370,7 @@ EffectType gEffectTypeTable[EFFECT_TYPE_COUNT] = {
 /* Draws a chain of EFFECT_MESH records into gCurrentOt; returns the word after the last. */
 int *DrawEffectMesh(int *meshData)
 {
-    long *screenXy;
+    s32 *screenXy;
     short *screenZ;
     POLY_FT4 *poly;
     int mode;
@@ -381,8 +382,8 @@ int *DrawEffectMesh(int *meshData)
     int vertexIndices;
     int v0Index;
     int depth;
-    long interp;
-    long gteFlag;
+    s32 interp;
+    s32 gteFlag;
 
     screenXy = MESH_SCRATCH->screenXy;
     screenZ = MESH_SCRATCH->screenZ;
@@ -419,10 +420,10 @@ int *DrawEffectMesh(int *meshData)
             meshData += 4;
             vertexIndices = *meshData++;
             v0Index = vertexIndices & 0xff;
-            *(long *)&poly->x0 = screenXy[v0Index];
-            *(long *)&poly->x1 = screenXy[(vertexIndices >> 8) & 0xff];
-            *(long *)&poly->x2 = screenXy[(vertexIndices >> 16) & 0xff];
-            *(long *)&poly->x3 = screenXy[(vertexIndices >> 24) & 0xff];
+            *(s32 *)&poly->x0 = screenXy[v0Index];
+            *(s32 *)&poly->x1 = screenXy[(vertexIndices >> 8) & 0xff];
+            *(s32 *)&poly->x2 = screenXy[(vertexIndices >> 16) & 0xff];
+            *(s32 *)&poly->x3 = screenXy[(vertexIndices >> 24) & 0xff];
             if (mode != EFFECT_MESH_BILLBOARD) {
                 depth = screenZ[v0Index];
             } else {
@@ -499,7 +500,7 @@ int SetupEffectTransform(int mode, int x, int y, int z)
     return shift;
 }
 
-void SpawnEffect(int type, long x, long y, long z)
+void SpawnEffect(int type, s32 x, s32 y, s32 z)
 {
     EffectSlot *effect;
     void *mesh;

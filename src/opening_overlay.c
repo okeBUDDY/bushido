@@ -5,6 +5,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 
+#include "int32.h"
 #include "packet_build.h"
 #include "gpu_code.h"
 #include "menu_state.h"
@@ -301,15 +302,15 @@ int AllocSlashOverlaySlot(const SlashOverlayPayload *source)
 
 
 static void BuildSemiTransLineG2(LINE_G2 *line, short x0, short y0, short x1,
-                   short y1, unsigned long rgb0, unsigned long rgb1)
+                   short y1, u32 rgb0, u32 rgb1)
 {
     SetLineG2(line);
     line->x0 = x0;
     line->y0 = y0;
     line->x1 = x1;
     line->y1 = y1;
-    *(unsigned long *)&line->r0 = (rgb0 & GPU_RGB_MASK) | GPU_CODE_WORD(GPU_CODE_LINE_G2 | GPU_CODE_SEMITRANS);
-    *(unsigned long *)&line->r1 = (rgb1 & GPU_RGB_MASK) | GPU_CODE_WORD(GPU_CODE_LINE_G2 | GPU_CODE_SEMITRANS);
+    *(u32 *)&line->r0 = (rgb0 & GPU_RGB_MASK) | GPU_CODE_WORD(GPU_CODE_LINE_G2 | GPU_CODE_SEMITRANS);
+    *(u32 *)&line->r1 = (rgb1 & GPU_RGB_MASK) | GPU_CODE_WORD(GPU_CODE_LINE_G2 | GPU_CODE_SEMITRANS);
 }
 
 static int EmitOverlaySlashBeams(PacketBuilder *build, SlashOverlaySlot *desc, int index, char **cursor,
@@ -329,7 +330,7 @@ static int EmitOverlaySlashBeams(PacketBuilder *build, SlashOverlaySlot *desc, i
             (LINE_G2 *)p,
             desc->payload.x - 64, desc->payload.y + desc->payload.height / 2,
             desc->payload.x + desc->payload.width / 2 - 1, desc->payload.y + desc->payload.height / 2,
-            0, *(unsigned long *)glow);
+            0, *(u32 *)glow);
         build->packets[index] = p;
         build->depths[index] = 0;
         index++;
@@ -338,7 +339,7 @@ static int EmitOverlaySlashBeams(PacketBuilder *build, SlashOverlaySlot *desc, i
             (LINE_G2 *)p,
             desc->payload.x + desc->payload.width / 2, desc->payload.y + desc->payload.height / 2,
             desc->payload.x + desc->payload.width + 64, desc->payload.y + desc->payload.height / 2,
-            *(unsigned long *)glow, 0);
+            *(u32 *)glow, 0);
         build->packets[index] = p;
         build->depths[index] = 0;
         index++;
@@ -347,7 +348,7 @@ static int EmitOverlaySlashBeams(PacketBuilder *build, SlashOverlaySlot *desc, i
             (LINE_G2 *)p,
             desc->payload.x, desc->payload.y + desc->payload.height / 2 + 1,
             desc->payload.x + desc->payload.width / 2 - 1, desc->payload.y + desc->payload.height / 2 + 1,
-            0, *(unsigned long *)edge);
+            0, *(u32 *)edge);
         build->packets[index] = p;
         build->depths[index] = 0;
         index++;
@@ -356,7 +357,7 @@ static int EmitOverlaySlashBeams(PacketBuilder *build, SlashOverlaySlot *desc, i
             (LINE_G2 *)p,
             desc->payload.x + desc->payload.width / 2, desc->payload.y + desc->payload.height / 2 + 1,
             desc->payload.x + desc->payload.width, desc->payload.y + desc->payload.height / 2 + 1,
-            *(unsigned long *)edge, 0);
+            *(u32 *)edge, 0);
         build->packets[index] = p;
         build->depths[index] = 0;
         index++;
@@ -365,7 +366,7 @@ static int EmitOverlaySlashBeams(PacketBuilder *build, SlashOverlaySlot *desc, i
             (LINE_G2 *)p,
             desc->payload.x, desc->payload.y + desc->payload.height / 2 - 1,
             desc->payload.x + desc->payload.width / 2 - 1, desc->payload.y + desc->payload.height / 2 - 1,
-            0, *(unsigned long *)edge);
+            0, *(u32 *)edge);
         build->packets[index] = p;
         build->depths[index] = 0;
         index++;
@@ -374,7 +375,7 @@ static int EmitOverlaySlashBeams(PacketBuilder *build, SlashOverlaySlot *desc, i
             (LINE_G2 *)p,
             desc->payload.x + desc->payload.width / 2, desc->payload.y + desc->payload.height / 2 - 1,
             desc->payload.x + desc->payload.width, desc->payload.y + desc->payload.height / 2 - 1,
-            *(unsigned long *)edge, 0);
+            *(u32 *)edge, 0);
         build->packets[index] = p;
         build->depths[index] = 0;
         index++;
@@ -394,7 +395,7 @@ static int EmitOverlaySlashBeams(PacketBuilder *build, SlashOverlaySlot *desc, i
             (LINE_G2 *)p,
             desc->payload.x - quarterW, desc->payload.y + desc->payload.height + quarterH,
             desc->payload.x + desc->payload.width / 2 - 1, desc->payload.y + desc->payload.height / 2,
-            0, *(unsigned long *)glow);
+            0, *(u32 *)glow);
         build->packets[index] = p;
         build->depths[index] = 0;
         index++;
@@ -403,7 +404,7 @@ static int EmitOverlaySlashBeams(PacketBuilder *build, SlashOverlaySlot *desc, i
             (LINE_G2 *)p,
             desc->payload.x + desc->payload.width / 2, desc->payload.y + desc->payload.height / 2,
             desc->payload.x + desc->payload.width + quarterW, desc->payload.y - quarterH,
-            *(unsigned long *)glow, 0);
+            *(u32 *)glow, 0);
         build->packets[index] = p;
         build->depths[index] = 0;
         index++;
@@ -412,7 +413,7 @@ static int EmitOverlaySlashBeams(PacketBuilder *build, SlashOverlaySlot *desc, i
             (LINE_G2 *)p,
             desc->payload.x - quarterW - slant, desc->payload.y + desc->payload.height + quarterH,
             desc->payload.x + desc->payload.width / 2 - 1 - slant, desc->payload.y + desc->payload.height / 2,
-            0, *(unsigned long *)edge);
+            0, *(u32 *)edge);
         build->packets[index] = p;
         build->depths[index] = 0;
         index++;
@@ -421,7 +422,7 @@ static int EmitOverlaySlashBeams(PacketBuilder *build, SlashOverlaySlot *desc, i
             (LINE_G2 *)p,
             desc->payload.x + desc->payload.width / 2 - slant, desc->payload.y + desc->payload.height / 2,
             desc->payload.x + desc->payload.width + quarterW - slant, desc->payload.y - quarterH,
-            *(unsigned long *)edge, 0);
+            *(u32 *)edge, 0);
         build->packets[index] = p;
         build->depths[index] = 0;
         index++;
@@ -430,7 +431,7 @@ static int EmitOverlaySlashBeams(PacketBuilder *build, SlashOverlaySlot *desc, i
             (LINE_G2 *)p,
             desc->payload.x - quarterW + slant, desc->payload.y + desc->payload.height + quarterH,
             desc->payload.x + desc->payload.width / 2 - 1 + slant, desc->payload.y + desc->payload.height / 2,
-            0, *(unsigned long *)edge);
+            0, *(u32 *)edge);
         build->packets[index] = p;
         build->depths[index] = 0;
         index++;
@@ -439,7 +440,7 @@ static int EmitOverlaySlashBeams(PacketBuilder *build, SlashOverlaySlot *desc, i
             (LINE_G2 *)p,
             desc->payload.x + desc->payload.width / 2 + slant, desc->payload.y + desc->payload.height / 2,
             desc->payload.x + desc->payload.width + quarterW + slant, desc->payload.y - quarterH,
-            *(unsigned long *)edge, 0);
+            *(u32 *)edge, 0);
         build->packets[index] = p;
         build->depths[index] = 0;
         index++;
@@ -523,7 +524,7 @@ static int EmitHorizontalSplitQuad(PacketBuilder *build, SlashOverlaySlot *desc,
     int yShift;
     int stripHeight;
     int xShift;
-    u_long rgbCode;
+    u32 rgbCode;
 
     quad = (POLY_FT4 *)*cursor;
     halfHeight = desc->payload.height / 2;
@@ -556,9 +557,9 @@ static int EmitHorizontalSplitQuad(PacketBuilder *build, SlashOverlaySlot *desc,
     quad->v3 = desc->payload.v + stripHeight;
     /* Neutral RGB texture modulation and the FT4 opcode share one word. */
     rgbCode = GPU_CODE_WORD(GPU_CODE_POLY_FT4) | GPU_RGB_NEUTRAL;
-    *(u_long *)&quad->r0 = rgbCode;
+    *(u32 *)&quad->r0 = rgbCode;
     if (((desc->payload.tpage >> TPAGE_ABR_SHIFT) & TPAGE_ABR_MASK) != 0) {
-        *(u_long *)&quad->r0 = GPU_CODE_WORD(GPU_CODE_POLY_FT4 | GPU_CODE_SEMITRANS) | GPU_RGB_NEUTRAL;
+        *(u32 *)&quad->r0 = GPU_CODE_WORD(GPU_CODE_POLY_FT4 | GPU_CODE_SEMITRANS) | GPU_RGB_NEUTRAL;
     }
 
     build->packets[index] = quad;
@@ -584,10 +585,10 @@ static int EmitHorizontalSplitQuad(PacketBuilder *build, SlashOverlaySlot *desc,
     quad->v2 = desc->payload.v + desc->payload.height - 1;
     quad->u3 = desc->payload.u + desc->payload.width - 1;
     quad->v3 = desc->payload.v + desc->payload.height - 1;
-    *(u_long *)&quad->r0 = rgbCode;
+    *(u32 *)&quad->r0 = rgbCode;
     ++index;
     if (((desc->payload.tpage >> TPAGE_ABR_SHIFT) & TPAGE_ABR_MASK) != 0) {
-        *(u_long *)&quad->r0 = GPU_CODE_WORD(GPU_CODE_POLY_FT4 | GPU_CODE_SEMITRANS) | GPU_RGB_NEUTRAL;
+        *(u32 *)&quad->r0 = GPU_CODE_WORD(GPU_CODE_POLY_FT4 | GPU_CODE_SEMITRANS) | GPU_RGB_NEUTRAL;
     }
 
     build->packets[index] = quad;
@@ -674,7 +675,7 @@ static int EmitWideOverlaySprites(PacketBuilder *build, SlashOverlaySlot *desc, 
     sprite->u0 = desc->payload.u;
     sprite->v0 = desc->payload.v;
     sprite->clut = desc->payload.clut;
-    *(u_long *)&sprite->r0 = GPU_CODE_WORD(GPU_CODE_SPRT) | level << 16 | level << 8 | level;
+    *(u32 *)&sprite->r0 = GPU_CODE_WORD(GPU_CODE_SPRT) | level << 16 | level << 8 | level;
     build->packets[index] = p;
     build->depths[index++] = 0;
     p += sizeof(SPRT);
@@ -693,7 +694,7 @@ static int EmitWideOverlaySprites(PacketBuilder *build, SlashOverlaySlot *desc, 
         sprite->u0 = 0;
         sprite->v0 = desc->payload.v;
         sprite->clut = desc->payload.clut;
-        *(u_long *)&sprite->r0 = GPU_CODE_WORD(GPU_CODE_SPRT) | level << 16 | level << 8 | level;
+        *(u32 *)&sprite->r0 = GPU_CODE_WORD(GPU_CODE_SPRT) | level << 16 | level << 8 | level;
         build->packets[index] = p;
         build->depths[index++] = 0;
         p += sizeof(SPRT);
@@ -714,7 +715,7 @@ static int EmitWideOverlaySprites(PacketBuilder *build, SlashOverlaySlot *desc, 
     sprite->u0 = 0;
     sprite->v0 = desc->payload.v;
     sprite->clut = desc->payload.clut;
-    *(u_long *)&sprite->r0 = GPU_CODE_WORD(GPU_CODE_SPRT) | level << 16 | level << 8 | level;
+    *(u32 *)&sprite->r0 = GPU_CODE_WORD(GPU_CODE_SPRT) | level << 16 | level << 8 | level;
     build->packets[index] = p;
     build->depths[index++] = 0;
     p += sizeof(SPRT);
@@ -751,7 +752,7 @@ int UpdateSlashOverlays(PacketBuilder *build)
     int index;
     int i;
     int level;
-    u_long code;
+    u32 code;
     int fade;
     void **outPackets;
     int *outDepths;
@@ -873,9 +874,9 @@ int UpdateSlashOverlays(PacketBuilder *build)
                 ((POLY_FT4 *)cursor)->v3 = desc->payload.v + desc->payload.height - 1;
                 level = fade << 3;
                 code = GPU_CODE_WORD(GPU_CODE_POLY_FT4) | (level << 16) | (level << 8) | level;
-                *(u_long *)&((POLY_FT4 *)cursor)->r0 = code;
+                *(u32 *)&((POLY_FT4 *)cursor)->r0 = code;
                 if (((desc->payload.tpage >> TPAGE_ABR_SHIFT) & TPAGE_ABR_MASK) != 0) {
-                    *(u_long *)&((POLY_FT4 *)cursor)->r0 = code | GPU_CODE_WORD(GPU_CODE_SEMITRANS);
+                    *(u32 *)&((POLY_FT4 *)cursor)->r0 = code | GPU_CODE_WORD(GPU_CODE_SEMITRANS);
                 }
                 depths[index] = 0;
                 packets[index] = cursor;

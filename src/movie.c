@@ -10,6 +10,7 @@
 #include <libpress.h>
 #include <libetc.h>
 
+#include "int32.h"
 #include "main.h"
 #include "pad.h"
 #ifndef VERSION_JP
@@ -31,9 +32,9 @@
 
 u_short *imgbuf0;
 u_short *imgbuf1;
-u_long *vlcbuf0;
-u_long *vlcbuf1;
-u_long *Ring_Buff;
+u32 *vlcbuf0;
+u32 *vlcbuf1;
+u32 *Ring_Buff;
 #ifdef VERSION_JP
 /* The Japanese player's decoder. Routines named alike in the two players are each player's own;
  * five take different arguments. */
@@ -43,8 +44,8 @@ MovieState *dec;
 MovieDisplayEnv *gMovieDisplayEnv0;
 MovieDisplayEnv *gMovieDisplayEnv1;
 MovieDisplayEnv *gMovieDisplayEnvs[2];
-u_long *ot0;
-u_long *ot1;
+u32 *ot0;
+u32 *ot1;
 POLY_FT4 *gMovieTileQuads;
 #ifdef VERSION_EU
 StHEADER *gMovieHeader;
@@ -52,7 +53,7 @@ int gMovieFrameNumber;
 int gMovieLastFrameNumber;
 #endif
 /* Written only by the Europe build; nothing reads it. */
-static u_long *gMovieSectorData;
+static u32 *gMovieSectorData;
 #endif
 
 /* The workspace holds, in order: the decoder state, the CD ring, two VLC buffers, two image
@@ -75,11 +76,11 @@ static void SetupMovieWorkspace(u_char *workspace)
     dec = (MovieState *)workspace;
     ringBuffer = workspace + sizeof(MovieState);
 #endif
-    Ring_Buff = (u_long *)ringBuffer;
+    Ring_Buff = (u32 *)ringBuffer;
     vlcPrimary = ringBuffer + MOVIE_RING_SECTORS * CD_SECTOR_SIZE;
-    vlcbuf0 = (u_long *)vlcPrimary;
+    vlcbuf0 = (u32 *)vlcPrimary;
     vlcSecondary = vlcPrimary + MOVIE_VLC_BUF_BYTES;
-    vlcbuf1 = (u_long *)vlcSecondary;
+    vlcbuf1 = (u32 *)vlcSecondary;
 #ifdef VERSION_JP
     imagePrimary = vlcSecondary + MOVIE_JP_VLC_SECOND_BYTES;
     imgbuf0 = (u_short *)imagePrimary;
@@ -90,13 +91,13 @@ static void SetupMovieWorkspace(u_char *workspace)
     imageSecondary = imagePrimary + MOVIE_WIDTH * MOVIE_HEIGHT * 2;
     imgbuf1 = (u_short *)imageSecondary;
     tiles = (POLY_FT4 *)(imageSecondary + MOVIE_WIDTH * MOVIE_HEIGHT * 2);
-    ot0 = (u_long *)(tiles + MOVIE_TILE_COUNT);
-    ot1 = (u_long *)(tiles + MOVIE_TILE_COUNT) + MOVIE_OT_LEN;
+    ot0 = (u32 *)(tiles + MOVIE_TILE_COUNT);
+    ot1 = (u32 *)(tiles + MOVIE_TILE_COUNT) + MOVIE_OT_LEN;
     gMovieTileQuads = tiles;
-    gMovieDisplayEnv0 = (MovieDisplayEnv *)((u_long *)(tiles + MOVIE_TILE_COUNT) + MOVIE_OT_LEN * 2);
-    gMovieDisplayEnv1 = (MovieDisplayEnv *)((u_long *)(tiles + MOVIE_TILE_COUNT) + MOVIE_OT_LEN * 2) + 1;
+    gMovieDisplayEnv0 = (MovieDisplayEnv *)((u32 *)(tiles + MOVIE_TILE_COUNT) + MOVIE_OT_LEN * 2);
+    gMovieDisplayEnv1 = (MovieDisplayEnv *)((u32 *)(tiles + MOVIE_TILE_COUNT) + MOVIE_OT_LEN * 2) + 1;
 #ifdef VERSION_EU
-    gMovieSectorData = (u_long *)(gMovieHeader + 1);
+    gMovieSectorData = (u32 *)(gMovieHeader + 1);
 #endif
 #endif
 }
@@ -145,7 +146,7 @@ int PrepareMoviePlayback(int movieId, u_char *workspace)
 }
 
 /* libcd's, which no kit header declares. */
-extern u_long StCdIntrFlag;
+extern u32 StCdIntrFlag;
 
 #ifndef VERSION_JP
 int StartMoviePlayback(void)
@@ -359,7 +360,7 @@ void AdvanceMovieSlice(void)
     }
 
     if (dec->slice.x < dec->frameRects[dec->frameIndex].x + dec->frameRects[dec->frameIndex].w) {
-        DecDCTout((u_long *)dec->imageBuffers[dec->imageIndex], dec->slice.w * ROUND_UP_16(dec->slice.h) / 2);
+        DecDCTout((u32 *)dec->imageBuffers[dec->imageIndex], dec->slice.w * ROUND_UP_16(dec->slice.h) / 2);
     } else {
         dec->frameReady = 1;
         dec->frameIndex = !dec->frameIndex;
@@ -367,7 +368,7 @@ void AdvanceMovieSlice(void)
         dec->slice.y = dec->frameRects[dec->frameIndex].y;
         gMovieFirstSlice = 1;
     }
-    LoadImage(&decoded, (u_long *)dec->imageBuffers[imageIndex]);
+    LoadImage(&decoded, (u32 *)dec->imageBuffers[imageIndex]);
 }
 #else
 void AdvanceMovieSlice(void)
@@ -384,7 +385,7 @@ void AdvanceMovieSlice(void)
     }
 
     if (dec->sliceRects[0].x < dec->frameRects[dec->frameIndex].x + dec->frameRects[dec->frameIndex].w) {
-        DecDCTout((u_long *)(dec->imageBuffers[dec->imageIndex] + dec->sliceRects[0].x * dec->sliceRects[0].h),
+        DecDCTout((u32 *)(dec->imageBuffers[dec->imageIndex] + dec->sliceRects[0].x * dec->sliceRects[0].h),
                   dec->sliceRects[0].w * dec->sliceRects[0].h / 2);
     } else {
         dec->frameReady = 1;
@@ -397,14 +398,14 @@ void AdvanceMovieSlice(void)
 #endif
 
 #ifdef VERSION_JP
-static u_long *FetchNextMovieFrame(MovieDecodeEnv *env, MovieStream *movie)
+static u32 *FetchNextMovieFrame(MovieDecodeEnv *env, MovieStream *movie)
 {
-    u_long *frame;
+    u32 *frame;
     StHEADER *header;
     int retries;
 
     retries = 0x100000;
-    while (StGetNext(&frame, (u_long **)&header) != 0) {
+    while (StGetNext(&frame, (u32 **)&header) != 0) {
         if (--retries == 0) {
             return 0;
         }
@@ -430,16 +431,16 @@ static u_long *FetchNextMovieFrame(MovieDecodeEnv *env, MovieStream *movie)
     return frame;
 }
 #else
-static u_long *FetchNextMovieFrame(void)
+static u32 *FetchNextMovieFrame(void)
 {
     int retries;
-    u_long *frame;
+    u32 *frame;
 #ifndef VERSION_EU
     StHEADER *gMovieHeader;
 #endif
 
     retries = 0x10000000;
-    while (StGetNext(&frame, (u_long **)&gMovieHeader) != 0) {
+    while (StGetNext(&frame, (u32 **)&gMovieHeader) != 0) {
         if (--retries == 0) {
             return 0;
         }
@@ -470,7 +471,7 @@ static u_long *FetchNextMovieFrame(void)
 void DecodeNextMovieVlc(MovieStream *movie)
 {
     int retries;
-    u_long *frame;
+    u32 *frame;
 
     retries = 1;
     while ((frame = FetchNextMovieFrame(dec, movie)) == 0) {
@@ -486,7 +487,7 @@ void DecodeNextMovieVlc(MovieStream *movie)
 #else
 void DecodeNextMovieVlc(void)
 {
-    u_long *frame;
+    u32 *frame;
 
     frame = FetchNextMovieFrame();
     if (frame == 0) {
@@ -593,7 +594,7 @@ static int DecodeMovieFrame(u_char *cdResult)
     }
 
     DecDCTin(dec->vlcBuffers[dec->vlcIndex], MOVIE_DCT_MODE_16BIT);
-    DecDCTout((u_long *)dec->imageBuffers[dec->imageIndex],
+    DecDCTout((u32 *)dec->imageBuffers[dec->imageIndex],
               dec->sliceRects[0].w * ROUND_UP_16(dec->sliceRects[0].h) / 2);
     UploadMovieFrameSlices();
     DecodeNextMovieVlc();
@@ -624,7 +625,7 @@ next_slice:
     rect.w = width;
     rect.h = height;
     x += MOVIE_SLICE_WIDTH;
-    LoadImage(&rect, (u_long *)((char *)dec->imageBuffers[image] + offset));
+    LoadImage(&rect, (u32 *)((char *)dec->imageBuffers[image] + offset));
     offset += MOVIE_SLICE_WIDTH * MOVIE_HEIGHT * sizeof(u_short);
     if (++slice < MOVIE_SLICE_COUNT) {
         goto next_slice;
@@ -646,7 +647,7 @@ int RunMoviePlaybackLoop(DISPENV *disp)
             break;
         }
         DecDCTin(dec->vlcBuffers[dec->vlcIndex], MOVIE_DCT_MODE_24BIT);
-        DecDCTout((u_long *)dec->imageBuffers[dec->imageIndex], dec->slice.w * ROUND_UP_16(dec->slice.h) / 2);
+        DecDCTout((u32 *)dec->imageBuffers[dec->imageIndex], dec->slice.w * ROUND_UP_16(dec->slice.h) / 2);
         DecodeNextMovieVlc(movie);
         WaitMovieFrameReady(0);
         if (gPadState.pressed & (_PAD(0, MENU_CANCEL) | _PAD(1, MENU_CANCEL))) {
@@ -682,8 +683,8 @@ int RunMoviePlaybackLoop(void)
     MovieState *state;
     int page;
     MovieDisplayEnv *display;
-    u_long *ot;
-    u_long *frameOt;
+    u32 *ot;
+    u32 *frameOt;
     u_char cdResult[8];
 
 #ifdef VERSION_EU

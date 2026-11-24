@@ -5,6 +5,7 @@
 #include <libetc.h>
 #include <libgpu.h>
 
+#include "int32.h"
 #include "packet_build.h"
 #include "light.h"
 #include "pose_angles.h"
@@ -391,7 +392,7 @@ char *SetupOpeningDemoStage(int variant, char *nextSection)
     SetFighterInjuryOverlayMask(0, 0);
     LoadSingleFighterSlot(0, gOpeningDemoModels[variant], WEAPON_ID_NONE, 0, 0, 0);
     CheckModelArenaCanary();
-    InitPoseStream((unsigned long *)gOpeningDemoPoseStream);
+    InitPoseStream((u32 *)gOpeningDemoPoseStream);
     gCameraNode.localMatrix.t[0] = 0;
     gCameraNode.localMatrix.t[1] = 0;
     gCameraNode.localMatrix.t[2] = 0;
@@ -414,7 +415,7 @@ void UpdateOpeningDemoFighterScene(void)
 {
     /* Never set; the callee reads rootPos[2], past its end, and the pose then replaces what it copied. */
     PoseAngles rootRotation;
-    long rootPos[2];
+    s32 rootPos[2];
     PoseAngles poseAngles;
     SVECTOR hiltOffset, tipOffset;
     short *cameraKey;

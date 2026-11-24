@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include <libgte.h>
 #include <libgpu.h>
+#include "int32.h"
 #include "light.h"
 #include "scene_node.h"
 #include "render_scratch.h"
@@ -144,15 +145,15 @@ void DrawOceanWaveMesh(void)
     int band;
     int (*row)[OCEAN_COL_COUNT];
     SVECTOR *vertices;
-    long *screen;
+    s32 *screen;
     unsigned short *depth;
     SVECTOR *vertex;
     const int *waveX;
     int i;
     int z;
-    long xy0, xy1, xy2;
-    long p, flag;
-    long sz0, sz1, sz2;
+    s32 xy0, xy1, xy2;
+    s32 p, flag;
+    s32 sz0, sz1, sz2;
 
     quadDescs = gOceanWaveQuadDescs;
     for (band = 0, row = gOceanWaveGridX; band < OCEAN_BAND_COUNT; ++band, ++row) {

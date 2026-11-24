@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <libetc.h>
 #include <inline_o.h>
+#include "int32.h"
 #include "cloth.h"
 
 void ClearClothModels(void)
@@ -134,7 +135,7 @@ static void InitClothPointsAndLinks(ClothModelSpec *spec, ClothModel *model)
 {
     VECTOR position;
     VECTOR center;
-    long flags;
+    s32 flags;
     ClothPoint *points;
     ClothPoint *point;
     int pinnedCount = 0;

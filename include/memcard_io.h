@@ -1,6 +1,8 @@
 #ifndef MEMCARD_IO_H
 #define MEMCARD_IO_H
 
+#include "int32.h"
+
 #define MEMORY_CARD_BLOCK_SIZE 0x2000
 #define MEMORY_CARD_TOTAL_BLOCKS 15
 #define MEMORY_CARD_NAME_MAX 20 /* DIRENTRY.name */
@@ -31,15 +33,15 @@ typedef enum MemoryCardProbeResult {
     MEMORY_CARD_PROBE_NEW_CARD = 2
 } MemoryCardProbeResult;
 
-extern long fd;
+extern s32 fd;
 
 void InitMemoryCard(void);
 int PollSwCardEvent(void);
 int ReadMemoryCardDirectory(int port, int slot);
 int GetMemoryCardFreeBlocks(void);
 int MemoryCardHasFile(char *filename);
-int StartMemoryCardRead(int port, int slot, char *filename, char *buffer, long size);
-int StartMemoryCardWrite(int port, int slot, char *filename, char *data, long blocks, long size, int create);
+int StartMemoryCardRead(int port, int slot, char *filename, char *buffer, s32 size);
+int StartMemoryCardWrite(int port, int slot, char *filename, char *data, s32 blocks, s32 size, int create);
 int StepMemoryCardProbe(int port, int slot);
 int FormatMemoryCard(int port, int slot);
 

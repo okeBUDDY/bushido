@@ -2,8 +2,9 @@
 #define VRAM_BACKUP_H
 
 #include <sys/types.h>
+#include "int32.h"
 
-u_long *BackupVramStrip(u_long *buffer);
+u32 *BackupVramStrip(u32 *buffer);
 int RestoreVramStrip(void);
 
 #endif

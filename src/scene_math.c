@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <libgte.h>
 #include <libgpu.h>
+#include "int32.h"
 #include "model_table.h"
 #include "scene_node.h"
 #include "angle.h"
@@ -447,7 +448,7 @@ static int ComputeAcosComplementRatio(int whole, int part)
 void UpdateNodeWorldMatrix(struct SceneNode *node)
 {
     SVECTOR translation;
-    long flag;
+    s32 flag;
 
     if (node->matrixState == SCENE_MATRIX_WORLD_VALID)
         return;

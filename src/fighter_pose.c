@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <libgte.h>
 #include <libgpu.h>
+#include "int32.h"
 #include "render.h"
 #include "stage_id.h"
 #include "story_cutscene.h"
@@ -73,7 +74,7 @@ VramClutCoord *gSlashEnemyClutLists[SLASH_ENEMY_CHAR_COUNT] = {
     gSlashEnemyChar19Cluts, gSlashEnemyChar20Cluts, gSlashEnemyChar21Cluts, gSlashEnemyChar22Cluts,
 };
 
-void UpdateAndEnqueueFighterPose(int side, int mode, long *position,
+void UpdateAndEnqueueFighterPose(int side, int mode, s32 *position,
                                  PoseAngles *rotation, PoseAngles *poseAngles, int floorY)
 {
     int stageId = GetLoadedStageId();
@@ -365,7 +366,7 @@ MATRIX **GetFighterWorldMatrixList(int side)
 }
 
 /* Nothing calls it. */
-long *GetFighterRootJointLocalPos(int side)
+s32 *GetFighterRootJointLocalPos(int side)
 {
     return gFighterSkeletons[side][1].localMatrix.t;
 }

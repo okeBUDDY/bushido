@@ -5,6 +5,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 
+#include "int32.h"
 #include "display_buffer.h"
 #include "packet_build.h"
 #include "scene_node.h"
@@ -42,7 +43,7 @@ void UpdateAndDrawBillboardEffects(void)
     MATRIX matrix;
     BillboardEffectWork *work = (BillboardEffectWork *)getScratchAddr(8);
     POLY_FT4 **prims;
-    long *depths;
+    s32 *depths;
     int i, count, bucket;
 
     BuildNegatedNodeRotation(&gCameraNode);
@@ -62,7 +63,7 @@ void UpdateAndDrawBillboardEffects(void)
     count = UpdateAndBuildBillboardEffects(work);
     prims = (POLY_FT4 **)work->packets;
     gPacketCursor = prims;
-    depths = (long *)(prims + count);
+    depths = (s32 *)(prims + count);
 
     for (i = 0; i < count; i++) {
         bucket = CompressDepthToOtz(depths[i] * 4 - 200, 0);

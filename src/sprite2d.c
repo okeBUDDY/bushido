@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <libgte.h>
 #include <libgpu.h>
+#include "int32.h"
 #include "display_buffer.h"
 #include "globals.h"
 #include "main.h"
@@ -38,9 +39,9 @@ static void DrawTexturedRectListAtOrigin(void *list)
         while (--count != -1) {
             packet = next;
             setlen(packet, 9);
-            *(u_long *)&packet->r0 = *(u_long *)&texture->r;
-            *(u_long *)&packet->u0 = *(u_long *)&texture->u0;
-            *(u_long *)&packet->u1 = *(u_long *)&texture->u1;
+            *(u32 *)&packet->r0 = *(u32 *)&texture->r;
+            *(u32 *)&packet->u0 = *(u32 *)&texture->u0;
+            *(u32 *)&packet->u1 = *(u32 *)&texture->u1;
             *(short *)&packet->u2 = *(int *)&texture->u2;
             *(short *)&packet->u3 = *(int *)&texture->u2 >> 16;
 
@@ -56,12 +57,12 @@ static void DrawTexturedRectListAtOrigin(void *list)
             /* POLY_FT4 words 2, 4, 6, 8 hold packed (x0,y0) .. (x3,y3). */
             left = rectX & 0xffff;
             top = (unsigned int)rectY << 16;
-            ((u_long *)packet)[2] = left | top;
+            ((u32 *)packet)[2] = left | top;
             right = (rectX + width) & 0xffff;
-            ((u_long *)packet)[4] = right | top;
+            ((u32 *)packet)[4] = right | top;
             bottom = (unsigned int)(rectY + height) << 16;
-            ((u_long *)packet)[6] = left | bottom;
-            ((u_long *)packet)[8] = right | bottom;
+            ((u32 *)packet)[6] = left | bottom;
+            ((u32 *)packet)[8] = right | bottom;
 
             AddPrim(gCurrentOt, packet);
             ++next;
@@ -94,9 +95,9 @@ void DrawTexturedRectList(void *list, int xOffset, int yOffset, int layer)
         while (--count != -1) {
             packet = next;
             setlen(packet, 9);
-            *(u_long *)&packet->r0 = *(u_long *)&texture->r;
-            *(u_long *)&packet->u0 = *(u_long *)&texture->u0;
-            *(u_long *)&packet->u1 = *(u_long *)&texture->u1;
+            *(u32 *)&packet->r0 = *(u32 *)&texture->r;
+            *(u32 *)&packet->u0 = *(u32 *)&texture->u0;
+            *(u32 *)&packet->u1 = *(u32 *)&texture->u1;
             *(short *)&packet->u2 = *(int *)&texture->u2;
             *(short *)&packet->u3 = *(int *)&texture->u2 >> 16;
 
@@ -114,12 +115,12 @@ void DrawTexturedRectList(void *list, int xOffset, int yOffset, int layer)
             /* POLY_FT4 words 2, 4, 6, 8 hold packed (x0,y0) .. (x3,y3). */
             left = rectX & 0xffff;
             top = (unsigned int)rectY << 16;
-            ((u_long *)packet)[2] = left | top;
+            ((u32 *)packet)[2] = left | top;
             right = (rectX + width) & 0xffff;
-            ((u_long *)packet)[4] = right | top;
+            ((u32 *)packet)[4] = right | top;
             bottom = (unsigned int)(rectY + height) << 16;
-            ((u_long *)packet)[6] = left | bottom;
-            ((u_long *)packet)[8] = right | bottom;
+            ((u32 *)packet)[6] = left | bottom;
+            ((u32 *)packet)[8] = right | bottom;
 
             ++next;
             AddPrim(gCurrentOt + layer, packet);
@@ -154,9 +155,9 @@ void DrawTexturedRectListImmediate(void *list, int xOffset, int yOffset)
 
         while (--count != -1) {
             setlen(packet, 9);
-            *(u_long *)&packet->r0 = *(u_long *)&texture->r;
-            *(u_long *)&packet->u0 = *(u_long *)&texture->u0;
-            *(u_long *)&packet->u1 = *(u_long *)&texture->u1;
+            *(u32 *)&packet->r0 = *(u32 *)&texture->r;
+            *(u32 *)&packet->u0 = *(u32 *)&texture->u0;
+            *(u32 *)&packet->u1 = *(u32 *)&texture->u1;
             *(short *)&packet->u2 = *(int *)&texture->u2;
             *(short *)&packet->u3 = *(int *)&texture->u2 >> 16;
 
@@ -175,10 +176,10 @@ void DrawTexturedRectListImmediate(void *list, int xOffset, int yOffset)
             top = (unsigned int)rectY << 16;
             right = (rectX + width) & 0xffff;
             bottom = (unsigned int)(rectY + height) << 16;
-            *(u_long *)&packet->x0 = left | top;
-            *(u_long *)&packet->x1 = right | top;
-            *(u_long *)&packet->x2 = left | bottom;
-            *(u_long *)&packet->x3 = right | bottom;
+            *(u32 *)&packet->x0 = left | top;
+            *(u32 *)&packet->x1 = right | top;
+            *(u32 *)&packet->x2 = left | bottom;
+            *(u32 *)&packet->x3 = right | bottom;
 
             DrawPrim(packet);
             ++packet;

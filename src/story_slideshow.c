@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <libgte.h>
 #include <libgpu.h>
+#include "int32.h"
 #include "display_buffer.h"
 #include "gpu_code.h"
 #include "screen_fade.h"
@@ -25,7 +26,7 @@ static void RecordPrologueBufferHighWater(void *bufferEnd);
 static int DrawBadEndingSlide(void);
 static POLY_FT4 *BuildTiledPolyFt4Grid(POLY_FT4 *packets, int texX, int texY, int width, int height,
                                        int tpageMode, int clutX, int clutY, int screenX, int screenY);
-static void SubmitTiledPolyFt4Grid(u_long *otEntry, POLY_FT4 *gridPackets);
+static void SubmitTiledPolyFt4Grid(u32 *otEntry, POLY_FT4 *gridPackets);
 
 #define CD_FILE_PROLOGUE_COMMON    0x56
 #define CD_FILE_PROLOGUE_CHAR_BASE 0x57
@@ -34,7 +35,7 @@ static void SubmitTiledPolyFt4Grid(u_long *otEntry, POLY_FT4 *gridPackets);
 #define PROLOGUE_BG_OT_INDEX         4095
 #define PROLOGUE_CARD_BRIGHTNESS_STEP 4
 #define PROLOGUE_CARD_BRIGHTNESS_MAX  128 /* a texture at its own brightness */
-#define TILED_GRID_END_TAG            ((u_long)-1)
+#define TILED_GRID_END_TAG            ((u32)-1)
 #define CLAMP_MAX(value, limit)       ((value) > (limit) ? (limit) : (value))
 
 typedef enum TPageColorMode {
@@ -529,7 +530,7 @@ static POLY_FT4 *BuildTiledPolyFt4Grid(POLY_FT4 *packets, int texX, int texY, in
     return packets;
 }
 
-static void SubmitTiledPolyFt4Grid(u_long *otEntry, POLY_FT4 *gridPackets)
+static void SubmitTiledPolyFt4Grid(u32 *otEntry, POLY_FT4 *gridPackets)
 {
     POLY_FT4 *packet;
 

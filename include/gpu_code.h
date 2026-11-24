@@ -1,6 +1,8 @@
 #ifndef GPU_CODE_H
 #define GPU_CODE_H
 
+#include "int32.h"
+
 /* GPU primitive codes. A primitive's colour word holds the code in its top byte above R, G, B. */
 #define GPU_CODE_POLY_FT3      0x24
 #define GPU_CODE_POLY_F4       0x28
@@ -19,8 +21,8 @@
  * blend mode (0 average, 1 add, 2 subtract, 3 add a quarter) and its depth (0 4-bit, 1 8-bit, 2 15-bit). */
 #define GET_TPAGE(depth, blend, x, y) ((((y) & 0x100) >> 4) | ((blend) << 5) | ((depth) << 7) | ((x) >> 6))
 
-#define GPU_CODE_WORD(code)    ((unsigned long)(code) << 24)
-#define GPU_RGB_MASK           0x00ffffffUL
-#define GPU_RGB_NEUTRAL        0x00808080UL /* texture colour 128, 128, 128: the texel unchanged */
+#define GPU_CODE_WORD(code)    ((u32)(code) << 24)
+#define GPU_RGB_MASK           ((u32)0x00ffffff)
+#define GPU_RGB_NEUTRAL        ((u32)0x00808080) /* texture colour 128, 128, 128: the texel unchanged */
 
 #endif

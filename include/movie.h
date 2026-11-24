@@ -5,6 +5,7 @@
 #include <libcd.h>
 #include <libgte.h>
 #include <libgpu.h>
+#include "int32.h"
 
 #define MOVIE_OT_LEN 4
 #define MOVIE_TILE_COUNT 80
@@ -40,7 +41,7 @@ typedef struct MovieDisplayEnv {
 /* The Japanese build's decoder state. Horizontal units are VRAM halfwords: a 24-bit pixel takes
  * one and a half. */
 typedef struct MovieDecodeEnv {
-    u_long *vlcBuffers[2];
+    u32 *vlcBuffers[2];
     int vlcIndex;
     u_short *imageBuffers[2]; /* one 16-pixel slice each */
     int imageIndex;
@@ -61,10 +62,10 @@ typedef struct MovieState {
     RECT sliceRects[2];
     int frameReady;
     int streamMode;
-    u_long *vlcBuffers[2];
+    u32 *vlcBuffers[2];
     u_short *imageBuffers[2];
     POLY_FT4 *tiles;
-    u_long *orderingTables[2];
+    u32 *orderingTables[2];
 } MovieState;
 
 /* One movie of the Japanese build's table; horizontal units are VRAM halfwords. */

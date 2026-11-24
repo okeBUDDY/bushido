@@ -7,6 +7,7 @@
 #include <libgpu.h>
 #include <inline_o.h>
 
+#include "int32.h"
 #include "weapon_trail.h"
 #include "fighter.h"
 #include "fighter_hit_sphere.h"
@@ -370,13 +371,13 @@ static void DrawWeaponTrail(WeaponTrailWork *work)
             edge = (newestIndex - age - 1) & WEAPON_TRAIL_HISTORY_MASK;
             ++vertex;
             if (left == 0) {
-                *(u_long *)&packet->r0 = startColor;
+                *(u32 *)&packet->r0 = startColor;
                 vertex->vx = (trail->edges + edge)->last.x - work->origin.vx;
                 vertex->vy = (trail->edges + edge)->last.y - work->origin.vy;
                 left = (unsigned int)-1 << scale;
                 vertex->vz = (trail->edges + edge)->last.z - work->origin.vz;
             } else if ((right = (unsigned int)(slice) << scale) == 0) {
-                *(u_long *)&packet->r0 = startColor;
+                *(u32 *)&packet->r0 = startColor;
                 vertex->vx = (trail->edges + edge)->first.x - work->origin.vx;
                 vertex->vy = (trail->edges + edge)->first.y - work->origin.vy;
                 left = (unsigned int)(parts - (slice + 1)) << scale;
@@ -389,7 +390,7 @@ static void DrawWeaponTrail(WeaponTrailWork *work)
                 gte_lddp(right);
                 gte_ldlvl(&trail->edges[edge].last);
                 gte_gpl12();
-                *(u_long *)&packet->r0 = startColor;
+                *(u32 *)&packet->r0 = startColor;
                 gte_stlvl(&work->firstDelta);
                 vertex->vx = work->firstDelta.x - work->origin.vx;
                 vertex->vy = work->firstDelta.y - work->origin.vy;
@@ -398,14 +399,14 @@ static void DrawWeaponTrail(WeaponTrailWork *work)
 
             ++vertex;
             if (left == 0) {
-                *(u_long *)&packet->r1 = startColor;
-                *(u_long *)&packet->r2 = endColor;
+                *(u32 *)&packet->r1 = startColor;
+                *(u32 *)&packet->r2 = endColor;
                 vertex->vx = (trail->edges + edge)->last.x - work->origin.vx;
                 vertex->vy = (trail->edges + edge)->last.y - work->origin.vy;
                 vertex->vz = (trail->edges + edge)->last.z - work->origin.vz;
             } else if ((right = (unsigned int)(slice + 1) << scale) == 0) {
-                *(u_long *)&packet->r1 = startColor;
-                *(u_long *)&packet->r2 = endColor;
+                *(u32 *)&packet->r1 = startColor;
+                *(u32 *)&packet->r2 = endColor;
                 vertex->vx = (trail->edges + edge)->first.x - work->origin.vx;
                 vertex->vy = (trail->edges + edge)->first.y - work->origin.vy;
                 vertex->vz = (trail->edges + edge)->first.z - work->origin.vz;
@@ -413,11 +414,11 @@ static void DrawWeaponTrail(WeaponTrailWork *work)
                 gte_lddp(left);
                 gte_ldlvl(&trail->edges[edge].first);
                 gte_gpf12();
-                *(u_long *)&packet->r1 = startColor;
+                *(u32 *)&packet->r1 = startColor;
                 gte_lddp(right);
                 gte_ldlvl(&trail->edges[edge].last);
                 gte_gpl12();
-                *(u_long *)&packet->r2 = endColor;
+                *(u32 *)&packet->r2 = endColor;
                 gte_stlvl(&work->firstDelta);
                 vertex->vx = work->firstDelta.x - work->origin.vx;
                 vertex->vy = work->firstDelta.y - work->origin.vy;
@@ -435,7 +436,7 @@ static void DrawWeaponTrail(WeaponTrailWork *work)
             *(u_short *)&packet->u3 = trail->uvRamp[u1];
             gte_stsxy(&packet->x3);
             gte_avsz4();
-            *(u_long *)&packet->r3 = endColor;
+            *(u32 *)&packet->r3 = endColor;
             gte_stotz(&work->depth);
             high = work->depth;
             low = high >> 1;

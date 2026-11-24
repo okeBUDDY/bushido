@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include <libgte.h>
 
+#include "int32.h"
 #include "light.h"
 #include "render.h"
 #include "shadow_proj.h"
@@ -37,7 +38,7 @@ void ProjectMatrixToShadowPlane(MATRIX *src, MATRIX *dst, int planeY)
 }
 
 /* Nothing calls it. */
-static void ProjectTransformToHeight(int lightSlot, MATRIX *src, MATRIX *dst, long height)
+static void ProjectTransformToHeight(int lightSlot, MATRIX *src, MATRIX *dst, s32 height)
 {
     MATRIX projection;
 

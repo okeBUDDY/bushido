@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <libgte.h>
 #include <libgpu.h>
+#include "int32.h"
 #include "effect_slot.h"
 #include "scene_node.h"
 #include "fighter_pose.h"
@@ -38,12 +39,12 @@ typedef struct PovOverlayArchiveHeader {
     int modelSize;
 } PovOverlayArchiveHeader;
 
-u_long gOverlayOtBuffers[2][POV_OVERLAY_OT_LEN];
+u32 gOverlayOtBuffers[2][POV_OVERLAY_OT_LEN];
 MATRIX gPovOverlayCameraMatrix;
 
 static int gPovOverlayFighterSlot;               /* 0 = P1, 1 = P2 */
 static struct SceneNode *gPovOverlayModelParts; /* the 15-part POV mannequin */
-u_long *gOverlayOt;                              /* active 256-entry overlay OT;
+u32 *gOverlayOt;                                 /* active 256-entry overlay OT;
                                                     also read by pov_tex.s and pov_flat.s */
 short gOverlayModelBoneMap[16] = { 1, 2, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, -1 };
 
@@ -81,8 +82,8 @@ void UpdatePovOverlayModel(int orbitAngle)
     MATRIX **fighterMatrices;
     short *boneMap;
     int boneIndex;
-    u_long *overlayOt;
-    u_long mainOtHead;
+    u32 *overlayOt;
+    u32 mainOtHead;
 
     boneMap = gOverlayModelBoneMap;
     fighterMatrices = GetFighterWorldMatrixList(gPovOverlayFighterSlot);
@@ -119,6 +120,6 @@ void UpdatePovOverlayModel(int orbitAngle)
     gOverlayOt = overlayOt;
     ClearOTagR(overlayOt, POV_OVERLAY_OT_LEN);
     mainOtHead = *gCurrentOt;
-    *gCurrentOt = (u_long)(gOverlayOt + (POV_OVERLAY_OT_LEN - 1)) & POV_OVERLAY_OT_ADDR_MASK;
+    *gCurrentOt = (u32)(gOverlayOt + (POV_OVERLAY_OT_LEN - 1)) & POV_OVERLAY_OT_ADDR_MASK;
     *gOverlayOt = mainOtHead;
 }

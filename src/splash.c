@@ -8,6 +8,7 @@
 #include <libgte.h>
 #include <libetc.h>
 #include <libgpu.h>
+#include "int32.h"
 #include "cd.h"
 #include "display_buffer.h"
 #include "load_area.h"
@@ -41,7 +42,7 @@ void PlayBootSplashScreen(void)
     DRAWENV draw;
     DISPENV disp;
 #endif
-    u_long ot[2];
+    u32 ot[2];
     SPRT sprites[2][3];
     DR_TPAGE tpages[2][3];
     TILE fadeTiles[2];
@@ -51,7 +52,7 @@ void PlayBootSplashScreen(void)
     int strip;
     int x;
     short fadeLevel;
-    u_long *otHead;
+    u32 *otHead;
     TILE *fadeTile;
     SPRT *sprite;
     DR_TPAGE *tpage;
@@ -62,9 +63,9 @@ void PlayBootSplashScreen(void)
     StartCdFileRead(ResolveCdFileHandle(CD_CATEGORY_MOTION, SPLASH_FILE_FIRST), DYNAMIC_LOAD_BUFFER);
     WaitCdIdle();
     setRECT(&rect, 640, 256, 256, 1);
-    LoadImage(&rect, (u_long *)DYNAMIC_LOAD_BUFFER + TIM_CLUT_DATA_WORDS);
+    LoadImage(&rect, (u32 *)DYNAMIC_LOAD_BUFFER + TIM_CLUT_DATA_WORDS);
     setRECT(&rect, 640, 0, 320, 256);
-    LoadImage(&rect, (u_long *)DYNAMIC_LOAD_BUFFER + TIM_8BIT_PIXEL_DATA_WORDS);
+    LoadImage(&rect, (u32 *)DYNAMIC_LOAD_BUFFER + TIM_8BIT_PIXEL_DATA_WORDS);
     DrawSync(0);
     SetDefDispEnv(&disp[0], 0, 256, 640, 256);
     SetDefDispEnv(&disp[1], 0, 0, 640, 256);
@@ -127,9 +128,9 @@ void PlayBootSplashScreen(void)
     disp[1].screen.x = 0;
     disp[1].screen.y = DISPLAY_SCREEN_Y;
     setRECT(&rect, 640, 256, 16, 1);
-    LoadImage(&rect, (u_long *)DYNAMIC_LOAD_BUFFER + TIM_CLUT_DATA_WORDS);
+    LoadImage(&rect, (u32 *)DYNAMIC_LOAD_BUFFER + TIM_CLUT_DATA_WORDS);
     setRECT(&rect, 640, 0, 80, 256);
-    LoadImage(&rect, (u_long *)DYNAMIC_LOAD_BUFFER + TIM_4BIT_PIXEL_DATA_WORDS);
+    LoadImage(&rect, (u32 *)DYNAMIC_LOAD_BUFFER + TIM_4BIT_PIXEL_DATA_WORDS);
     DrawSync(0);
     SetDispMask(1);
     for (frame = 0; frame < SPLASH_DURATION_FRAMES; frame++) {
@@ -176,9 +177,9 @@ void PlayBootSplashScreen(void)
     StartCdFileRead(ResolveCdFileHandle(CD_CATEGORY_MOTION, SPLASH_FILE_FIRST), DYNAMIC_LOAD_BUFFER);
     WaitCdIdle();
     setRECT(&rect, 640, 60, 16, 1);
-    LoadImage(&rect, (u_long *)DYNAMIC_LOAD_BUFFER + TIM_CLUT_DATA_WORDS);
+    LoadImage(&rect, (u32 *)DYNAMIC_LOAD_BUFFER + TIM_CLUT_DATA_WORDS);
     setRECT(&rect, 640, 0, 160, 60);
-    LoadImage(&rect, (u_long *)DYNAMIC_LOAD_BUFFER + TIM_4BIT_PIXEL_DATA_WORDS);
+    LoadImage(&rect, (u32 *)DYNAMIC_LOAD_BUFFER + TIM_4BIT_PIXEL_DATA_WORDS);
     DrawSync(0);
     SetDefDispEnv(&disp, 0, 0, 640, 480);
     SetDefDrawEnv(&draw, 0, 0, 640, 480);

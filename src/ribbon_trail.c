@@ -5,6 +5,7 @@
 #include <libgpu.h>
 #include <inline_o.h>
 
+#include "int32.h"
 #include "ribbon_trail.h"
 #include "gpu_code.h"
 #include "cloth.h"
@@ -184,10 +185,10 @@ int UpdateAndBuildRibbonPackets(RibbonDraw *work)
     int column;
     int edge;
     int cornerEnd;
-    long topColor;
-    long bottomColor;
+    s32 topColor;
+    s32 bottomColor;
     POLY_GT4 *poly;
-    long *depthList;
+    s32 *depthList;
     RibbonSample *sample;
     int i;
     int nearUv;
@@ -224,7 +225,7 @@ int UpdateAndBuildRibbonPackets(RibbonDraw *work)
     segments = 1 << lod;
     poly = work->packets;
     {
-        long depths[segments * RIBBON_TRAIL_VISIBLE_SEGMENTS];
+        s32 depths[segments * RIBBON_TRAIL_VISIBLE_SEGMENTS];
         POLY_GT4 *polys[segments * RIBBON_TRAIL_VISIBLE_SEGMENTS];
 
         for (row = 0; row < RIBBON_TRAIL_VISIBLE_SEGMENTS; row++) {
@@ -263,15 +264,15 @@ int UpdateAndBuildRibbonPackets(RibbonDraw *work)
                 poly->tpage = ribbon->tpage;
                 poly->clut = ribbon->clut;
                 gte_stotz(&depths[count++]);
-                *(long *)&poly->r0 = topColor;
-                *(long *)&poly->r1 = topColor;
-                *(long *)&poly->r2 = bottomColor;
-                *(long *)&poly->r3 = bottomColor;
+                *(s32 *)&poly->r0 = topColor;
+                *(s32 *)&poly->r1 = topColor;
+                *(s32 *)&poly->r2 = bottomColor;
+                *(s32 *)&poly->r3 = bottomColor;
                 poly++;
             }
         }
         work->packets = poly;
-        depthList = (long *)poly + count;
+        depthList = (s32 *)poly + count;
         for (i = 0; i < count; i++)
             ((POLY_GT4 **)poly)[i] = polys[i];
         for (i = 0; i < count; i++)

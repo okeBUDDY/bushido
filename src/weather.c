@@ -6,6 +6,7 @@
 #include <rand.h>
 #include <inline_o.h>
 
+#include "int32.h"
 #include "weather.h"
 #include "cloth.h"
 #include "gpu_code.h"
@@ -35,8 +36,8 @@ typedef struct {
     union {
         VECTOR pos; /* copied whole each frame; its fourth word then says it holds a position */
         struct {
-            long vx, vy, vz;
-            long valid;
+            s32 vx, vy, vz;
+            s32 valid;
         } tracked;
     } lastCamera;
     unsigned short phase;
@@ -152,7 +153,7 @@ int UpdateAndDrawSnow(WeatherScratch *scratch)
     int screenX, screenY;
     int coord;
     int sizeIndex;
-    long screenZ;
+    s32 screenZ;
     int otShift;
 
     work = gParticleWork;
@@ -323,8 +324,8 @@ int UpdateAndDrawRain(WeatherScratch *scratch)
 {
     int i;
     int phase;
-    u_long lineRgb0, lineRgb1;
-    u_long splashColorCode;
+    u32 lineRgb0, lineRgb1;
+    u32 splashColorCode;
     WeatherWork *work;
     WeatherParticle *particle;
     LINE_G2 *line;
@@ -458,13 +459,13 @@ int UpdateAndDrawRain(WeatherScratch *scratch)
                 gte_ldv0(&scratch->verts[0]);
                 gte_rtps();
                 SetPolyFT4(splashPoly);
-                *(u_long *)&splashPoly->r0 = splashColorCode;
+                *(u32 *)&splashPoly->r0 = splashColorCode;
                 gte_stsxy(&scratch->screenPos[0]);
                 screenX = scratch->screenPos[0].vx;
                 screenY = scratch->screenPos[0].vy;
                 if ((u_int)(screenX + 32) < DISPLAY_WIDTH + 64 && screenY < DISPLAY_HEIGHT + 32) {
                     gte_stszotz(&scratch->depth);
-                    *(u_long *)&splashPoly->x0 = *(u_long *)&scratch->screenPos[0];
+                    *(u32 *)&splashPoly->x0 = *(u32 *)&scratch->screenPos[0];
                     scratch->verts[1].x = scratch->particle.x + 100;
                     scratch->verts[1].y = scratch->particle.y;
                     scratch->verts[1].z = scratch->particle.z - 100;
@@ -501,8 +502,8 @@ int UpdateAndDrawRain(WeatherScratch *scratch)
             gte_ldv0(&scratch->particle);
             gte_rtps();
             SetLineG2(line);
-            *(u_long *)&line->r0 = lineRgb0;
-            *(u_long *)&line->r1 = lineRgb1;
+            *(u32 *)&line->r0 = lineRgb0;
+            *(u32 *)&line->r1 = lineRgb1;
             gte_stsxy(&scratch->screenPos[0]);
             screenX = scratch->screenPos[0].vx;
             screenY = scratch->screenPos[0].vy;
@@ -522,7 +523,7 @@ int UpdateAndDrawRain(WeatherScratch *scratch)
                 }
                 gte_ldv0(&scratch->verts[0]);
                 gte_rtps();
-                *(u_long *)&line->x0 = *(u_long *)&scratch->screenPos[0];
+                *(u32 *)&line->x0 = *(u32 *)&scratch->screenPos[0];
                 particle->offscreen = 0;
                 gte_stsxy(&line->x1);
                 otShift = scratch->depth >> 12;

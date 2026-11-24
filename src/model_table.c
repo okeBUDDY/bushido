@@ -5,6 +5,7 @@
 #include <stdarg.h>
 #include <libgte.h>
 #include <libgpu.h>
+#include "int32.h"
 #include "globals.h"
 #include "main.h"
 #include "mesh_stream.h"
@@ -250,17 +251,17 @@ typedef struct {
 static void DrawFlatTriangleNode(FlatPrimNode *tri)
 {
     SVECTOR corners[4];
-    long p;
-    long otz;
-    long flag;
+    s32 p;
+    s32 otz;
+    s32 flag;
 
     corners[0] = tri->corners[0];
     corners[1] = tri->corners[1];
     corners[2] = tri->corners[2];
     corners[3] = tri->corners[3];
     if (RotAverageNclip3(&corners[0], &corners[1], &corners[2],
-                         (long *)&((POLY_F3 *)gPacketCursor)->x0, (long *)&((POLY_F3 *)gPacketCursor)->x1,
-                         (long *)&((POLY_F3 *)gPacketCursor)->x2,
+                         (s32 *)&((POLY_F3 *)gPacketCursor)->x0, (s32 *)&((POLY_F3 *)gPacketCursor)->x1,
+                         (s32 *)&((POLY_F3 *)gPacketCursor)->x2,
                          &p, &otz, &flag) > 0) {
         *(CVECTOR *)&((POLY_F3 *)gPacketCursor)->r0 = tri->color;
         if (otz > 0 && otz < BILLBOARD_MAX_VIEW_DEPTH) {
@@ -276,17 +277,17 @@ static void DrawFlatTriangleNode(FlatPrimNode *tri)
 static void DrawFlatQuadNode(FlatPrimNode *quad)
 {
     SVECTOR corners[4];
-    long p;
-    long otz;
-    long flag;
+    s32 p;
+    s32 otz;
+    s32 flag;
 
     corners[0] = quad->corners[0];
     corners[1] = quad->corners[1];
     corners[2] = quad->corners[2];
     corners[3] = quad->corners[3];
     if (RotAverageNclip4(&corners[0], &corners[1], &corners[2], &corners[3],
-                         (long *)&((POLY_F4 *)gPacketCursor)->x2, (long *)&((POLY_F4 *)gPacketCursor)->x0,
-                         (long *)&((POLY_F4 *)gPacketCursor)->x1, (long *)&((POLY_F4 *)gPacketCursor)->x3,
+                         (s32 *)&((POLY_F4 *)gPacketCursor)->x2, (s32 *)&((POLY_F4 *)gPacketCursor)->x0,
+                         (s32 *)&((POLY_F4 *)gPacketCursor)->x1, (s32 *)&((POLY_F4 *)gPacketCursor)->x3,
                          &p, &otz, &flag) > 0) {
         *(CVECTOR *)&((POLY_F4 *)gPacketCursor)->r0 = quad->color;
         otz <<= 2;
@@ -303,14 +304,14 @@ static void DrawFlatQuadNode(FlatPrimNode *quad)
 static void DrawFlatLineNode(FlatPrimNode *line)
 {
     SVECTOR corners[2];
-    long p;
-    long flag;
+    s32 p;
+    s32 flag;
 
     corners[0] = line->corners[0];
     corners[1] = line->corners[1];
     SetLineF2(gPacketCursor);
-    RotTransPers(&corners[0], (long *)&((LINE_F2 *)gPacketCursor)->x0, &p, &flag);
-    RotTransPers(&corners[1], (long *)&((LINE_F2 *)gPacketCursor)->x1, &p, &flag);
+    RotTransPers(&corners[0], (s32 *)&((LINE_F2 *)gPacketCursor)->x0, &p, &flag);
+    RotTransPers(&corners[1], (s32 *)&((LINE_F2 *)gPacketCursor)->x1, &p, &flag);
     *(CVECTOR *)&((LINE_F2 *)gPacketCursor)->r0 = line->color;
     ((LINE_F2 *)gPacketCursor)->code = gLineF2Code;
     AddPrim(RENDER_SCRATCH->orderingTable, ((LINE_F2 *)gPacketCursor)++);
@@ -332,8 +333,8 @@ static void DrawBillboardQuadNode(struct SceneNode *node)
     BillboardQuadGroup *quadGroup;
     POLY_FT4 *poly;
     unsigned int vertexIndices;
-    long p;
-    long flag;
+    s32 p;
+    s32 flag;
 
     camera = gCameraNodePtr;
     dx = node->worldMatrix.t[0] - camera->worldMatrix.t[0];
@@ -382,10 +383,10 @@ static void DrawBillboardQuadNode(struct SceneNode *node)
             &vertices[(vertexIndices >> 8) & 0xff],
             &vertices[(vertexIndices >> 16) & 0xff],
             &vertices[vertexIndices >> 24],
-            (long *)&quadGroup->poly.x0,
-            (long *)&quadGroup->poly.x1,
-            (long *)&quadGroup->poly.x2,
-            (long *)&quadGroup->poly.x3,
+            (s32 *)&quadGroup->poly.x0,
+            (s32 *)&quadGroup->poly.x1,
+            (s32 *)&quadGroup->poly.x2,
+            (s32 *)&quadGroup->poly.x3,
             &p,
             &flag
         );
@@ -436,17 +437,17 @@ static int MaxQuadOtz(int sz0, int sz1, int sz2, int sz3)
     return sz0 >> 2;
 }
 
-static long AverageScreenZ3(long sz0, long sz1, long sz2)
+static s32 AverageScreenZ3(s32 sz0, s32 sz1, s32 sz2)
 {
     return AverageZ3(sz0, sz1, sz2) << 2;
 }
 
-static long AverageScreenZ4(long sz0, long sz1, long sz2, long sz3)
+static s32 AverageScreenZ4(s32 sz0, s32 sz1, s32 sz2, s32 sz3)
 {
     return AverageZ4(sz0, sz1, sz2, sz3) << 2;
 }
 
-static long MinScreenZ3(long sz0, long sz1, long sz2)
+static s32 MinScreenZ3(s32 sz0, s32 sz1, s32 sz2)
 {
     if (sz0 < sz1) {
         if (sz0 < sz2)
@@ -458,7 +459,7 @@ static long MinScreenZ3(long sz0, long sz1, long sz2)
     return sz2;
 }
 
-static long MinScreenZ4(long sz0, long sz1, long sz2, long sz3)
+static s32 MinScreenZ4(s32 sz0, s32 sz1, s32 sz2, s32 sz3)
 {
     if (sz1 < sz0)
         sz0 = sz1;
@@ -469,7 +470,7 @@ static long MinScreenZ4(long sz0, long sz1, long sz2, long sz3)
     return sz0;
 }
 
-static long MaxScreenZ3(long sz0, long sz1, long sz2)
+static s32 MaxScreenZ3(s32 sz0, s32 sz1, s32 sz2)
 {
     if (sz0 < sz1)
         sz0 = sz1;
@@ -478,7 +479,7 @@ static long MaxScreenZ3(long sz0, long sz1, long sz2)
     return sz0;
 }
 
-static long MaxScreenZ4(long sz0, long sz1, long sz2, long sz3)
+static s32 MaxScreenZ4(s32 sz0, s32 sz1, s32 sz2, s32 sz3)
 {
     if (sz0 < sz1)
         sz0 = sz1;

@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <libgte.h>
 #include <libgpu.h>
+#include "int32.h"
 #include "world_vector.h"
 #include "fighter_pose.h"
 #include "light.h"
@@ -301,7 +302,7 @@ int UpdateStoryCutscene(void)
     unsigned int p1FaceCommand;
     /* Never set; the callee reads rootPos[2], past its end, and the pose then replaces what it copied. */
     PoseAngles rootRotation;
-    long rootPos[2];
+    s32 rootPos[2];
     PoseAngles poseAngles;
 
     gPacketCursor = GetGpuPacketBuffer(gFrameCounter & 1);

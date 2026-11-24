@@ -1,6 +1,8 @@
 #ifndef POSE_STREAM_H
 #define POSE_STREAM_H
 
+#include "int32.h"
+
 /* A pose stream: a 92-byte header of 51 12-bit default joint angles and 51 2-bit delta modes, then
  * a big-endian 24-bit bit offset (from byte 0x5c) for each group of eight frames: a key pose and
  * seven second-order deltas. */
@@ -32,9 +34,9 @@ typedef struct PoseWork {
 #define POSE_DECODE_WORK ((PoseWork *)getScratchAddr(0))
 
 typedef struct PoseBitState {
-    unsigned long *ptr;
+    u32 *ptr;
     int left;
-    unsigned long word;
+    u32 word;
 } PoseBitState;
 
 typedef struct PoseCache {
@@ -44,7 +46,7 @@ typedef struct PoseCache {
     PoseBitState bitState;               /* the bit reader after this frame */
 } PoseCache;
 
-void InitPoseStream(unsigned long *stream);
+void InitPoseStream(u32 *stream);
 void DecodePoseFrame(int frame, void *output, PoseWork *work);
 void DecodePoseFramePair(int frameA, int frameB, void *outputA, void *outputB, PoseWork *work);
 

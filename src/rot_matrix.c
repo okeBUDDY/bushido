@@ -7,6 +7,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 
+#include "int32.h"
 #include "light.h"
 #include "packet_build.h"
 #include "scene_node.h"
@@ -247,17 +248,17 @@ void SubmitSceneDisplayListNoOp(void)
  * Each record holds a double-buffered POLY_FT3 template pair (16 words), packed vertex
  * indices (1 word), and an SVECTOR face normal (2 words). Nothing calls it.
  */
-static u_long *DrawDoubleSidedPolyFt3(u_short primCount, u_long *primStream)
+static u32 *DrawDoubleSidedPolyFt3(u_short primCount, u32 *primStream)
 {
     CVECTOR litColor;
     SVECTOR faceNormal;
     POLY_FT3 *templateTri;
-    u_long vertexIndices;
-    u_long vert0, vert1, vert2;
-    long screenXy0, screenXy1, screenXy2;
-    long *screenXy;
+    u32 vertexIndices;
+    u32 vert0, vert1, vert2;
+    s32 screenXy0, screenXy1, screenXy2;
+    s32 *screenXy;
     short *screenZ;
-    long otz;
+    s32 otz;
     SVECTOR *sourceNormal;
 
     screenXy = MESH_SCRATCH->screenXy;
@@ -292,12 +293,12 @@ static u_long *DrawDoubleSidedPolyFt3(u_short primCount, u_long *primStream)
             NormalColor(&faceNormal, &litColor);
             MESH_SCRATCH->packetCursor->tag = POLY_FT3_TAG_LEN;
             *(CVECTOR *)&MESH_SCRATCH->packetCursor->r0 = litColor;
-            *(long *)&MESH_SCRATCH->packetCursor->x0 = screenXy0;
-            *(long *)&MESH_SCRATCH->packetCursor->x1 = screenXy1;
-            *(long *)&MESH_SCRATCH->packetCursor->x2 = screenXy2;
-            *(u_long *)&MESH_SCRATCH->packetCursor->u0 = *(u_long *)&templateTri->u0;
-            *(u_long *)&MESH_SCRATCH->packetCursor->u1 = *(u_long *)&templateTri->u1;
-            *(u_long *)&MESH_SCRATCH->packetCursor->u2 = *(u_long *)&templateTri->u2;
+            *(s32 *)&MESH_SCRATCH->packetCursor->x0 = screenXy0;
+            *(s32 *)&MESH_SCRATCH->packetCursor->x1 = screenXy1;
+            *(s32 *)&MESH_SCRATCH->packetCursor->x2 = screenXy2;
+            *(u32 *)&MESH_SCRATCH->packetCursor->u0 = *(u32 *)&templateTri->u0;
+            *(u32 *)&MESH_SCRATCH->packetCursor->u1 = *(u32 *)&templateTri->u1;
+            *(u32 *)&MESH_SCRATCH->packetCursor->u2 = *(u32 *)&templateTri->u2;
             AddPrim(MESH_SCRATCH->orderingTable + CompressDepthToOtz(otz << 2, 0), MESH_SCRATCH->packetCursor);
             MESH_SCRATCH->packetCursor++;
         }
@@ -314,16 +315,16 @@ static u_long *DrawDoubleSidedPolyFt3(u_short primCount, u_long *primStream)
  * (20 words), packed 4-vertex indices (1 word), and an SVECTOR face normal (2 words).
  * Nothing calls it.
  */
-static u_long *DrawDoubleSidedPolyFt4AsTris(u_short primCount, u_long *primStream)
+static u32 *DrawDoubleSidedPolyFt4AsTris(u_short primCount, u32 *primStream)
 {
     CVECTOR litColor;
     SVECTOR faceNormal;
     POLY_FT4 *templateQuad;
-    u_long vertexIndices;
-    long screenXy0, screenXy1, screenXy2, screenXy3;
-    long *screenXy;
+    u32 vertexIndices;
+    s32 screenXy0, screenXy1, screenXy2, screenXy3;
+    s32 *screenXy;
     short *screenZ;
-    long otz;
+    s32 otz;
     SVECTOR *sourceNormal;
 
     screenXy = MESH_SCRATCH->screenXy;
@@ -360,12 +361,12 @@ static u_long *DrawDoubleSidedPolyFt4AsTris(u_short primCount, u_long *primStrea
             litColor.cd = GPU_CODE_POLY_FT3;
             MESH_SCRATCH->packetCursor->tag = POLY_FT3_TAG_LEN;
             *(CVECTOR *)&MESH_SCRATCH->packetCursor->r0 = litColor;
-            *(long *)&MESH_SCRATCH->packetCursor->x0 = screenXy0;
-            *(long *)&MESH_SCRATCH->packetCursor->x1 = screenXy1;
-            *(long *)&MESH_SCRATCH->packetCursor->x2 = screenXy2;
-            *(u_long *)&MESH_SCRATCH->packetCursor->u0 = *(u_long *)&templateQuad->u0;
-            *(u_long *)&MESH_SCRATCH->packetCursor->u1 = *(u_long *)&templateQuad->u1;
-            *(u_long *)&MESH_SCRATCH->packetCursor->u2 = *(u_long *)&templateQuad->u2;
+            *(s32 *)&MESH_SCRATCH->packetCursor->x0 = screenXy0;
+            *(s32 *)&MESH_SCRATCH->packetCursor->x1 = screenXy1;
+            *(s32 *)&MESH_SCRATCH->packetCursor->x2 = screenXy2;
+            *(u32 *)&MESH_SCRATCH->packetCursor->u0 = *(u32 *)&templateQuad->u0;
+            *(u32 *)&MESH_SCRATCH->packetCursor->u1 = *(u32 *)&templateQuad->u1;
+            *(u32 *)&MESH_SCRATCH->packetCursor->u2 = *(u32 *)&templateQuad->u2;
             AddPrim(MESH_SCRATCH->orderingTable + CompressDepthToOtz(otz << 2, 0), MESH_SCRATCH->packetCursor);
             MESH_SCRATCH->packetCursor++;
         }
@@ -390,15 +391,15 @@ static u_long *DrawDoubleSidedPolyFt4AsTris(u_short primCount, u_long *primStrea
             litColor.cd = GPU_CODE_POLY_FT3;
             MESH_SCRATCH->packetCursor->tag = POLY_FT3_TAG_LEN;
             *(CVECTOR *)&MESH_SCRATCH->packetCursor->r0 = litColor;
-            *(long *)&MESH_SCRATCH->packetCursor->x0 = screenXy1;
-            *(long *)&MESH_SCRATCH->packetCursor->x1 = screenXy3;
-            *(long *)&MESH_SCRATCH->packetCursor->x2 = screenXy2;
+            *(s32 *)&MESH_SCRATCH->packetCursor->x0 = screenXy1;
+            *(s32 *)&MESH_SCRATCH->packetCursor->x1 = screenXy3;
+            *(s32 *)&MESH_SCRATCH->packetCursor->x2 = screenXy2;
             MESH_SCRATCH->packetCursor->tpage = templateQuad->tpage;
             MESH_SCRATCH->packetCursor->clut = templateQuad->clut;
             /* the original reads each (u, v) pair as a word and stores its low half */
-            *(u_short *)&MESH_SCRATCH->packetCursor->u0 = *(u_long *)&templateQuad->u1;
-            *(u_short *)&MESH_SCRATCH->packetCursor->u1 = *(u_long *)&templateQuad->u3;
-            *(u_short *)&MESH_SCRATCH->packetCursor->u2 = *(u_long *)&templateQuad->u2;
+            *(u_short *)&MESH_SCRATCH->packetCursor->u0 = *(u32 *)&templateQuad->u1;
+            *(u_short *)&MESH_SCRATCH->packetCursor->u1 = *(u32 *)&templateQuad->u3;
+            *(u_short *)&MESH_SCRATCH->packetCursor->u2 = *(u32 *)&templateQuad->u2;
             AddPrim(MESH_SCRATCH->orderingTable + CompressDepthToOtz(otz << 2, 0), MESH_SCRATCH->packetCursor);
             MESH_SCRATCH->packetCursor++;
         }

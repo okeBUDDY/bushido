@@ -101,6 +101,10 @@ nothing.
 Where the builds differ, the source says so with `#ifdef VERSION_JP` (Japan) or `VERSION_EU` (Europe); the
 North American build is the unconditioned text.
 
+The game's own 32-bit integers are `s32` and `u32` (`include/int32.h`), not `long` and `u_long`: on the
+PlayStation they are `long` and `unsigned long`, so the build is unchanged, and on a host where `long` is 64
+bits wide they stay 32 bits. Sony's library in `src/lib` and its private headers keep the kit's spelling.
+
 ## Documents
 
 - [docs/building.md](docs/building.md): the toolchain, how each tool was identified, the library recipes, the

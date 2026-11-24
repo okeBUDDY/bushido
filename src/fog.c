@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include <libgte.h>
 #include <libgpu.h>
+#include "int32.h"
 #include "display_buffer.h"
 #include "model_arena.h"
 #include "fog.h"
@@ -147,7 +148,7 @@ void LinkCharFogClutMoves(unsigned int depth, unsigned int depthSpan, int direct
 void LinkFinalFogClutDirect(void)
 {
     gCurrentOt[FOG_FINAL_OT_BUCKET] =
-        (u_long)&gMainFogMoves[gFrameCounter & 1][gMainFogStepCount - 1] & 0x00ffffff;
+        (u32)&gMainFogMoves[gFrameCounter & 1][gMainFogStepCount - 1] & 0x00ffffff;
 }
 
 void BuildFogClutTable(void)
@@ -184,7 +185,7 @@ void BuildFogClutTable(void)
     rect.y = FOG_MAIN_CLUT_Y;
     rect.w = FOG_MAIN_CLUT_WIDTH;
     rect.h = 1;
-    StoreImage(&rect, (u_long *)sourceClut);
+    StoreImage(&rect, (u32 *)sourceClut);
     DrawSync(0);
 
     GetGteFarColor(&fog);
@@ -235,7 +236,7 @@ void BuildFogClutTable(void)
 
         rect.x = x;
         rect.y = y;
-        LoadImage(&rect, (u_long *)blendedClut);
+        LoadImage(&rect, (u32 *)blendedClut);
         DrawSync(0);
         SetDrawMove(&gMainFogMoves[0][step], &rect, 0, FOG_MAIN_CLUT_Y);
         gMainFogMoves[1][step] = gMainFogMoves[0][step];
@@ -275,7 +276,7 @@ void BuildCharFogClutTable(void)
     rect.y = FOG_CHAR_CLUT_Y;
     rect.w = FOG_CHAR_CLUT_WIDTH;
     rect.h = FOG_CHAR_CLUT_HEIGHT;
-    StoreImage(&rect, (u_long *)sourceClut);
+    StoreImage(&rect, (u32 *)sourceClut);
     DrawSync(0);
     GetGteFarColor(&fog);
 
@@ -320,7 +321,7 @@ void BuildCharFogClutTable(void)
         }
         rect.x = x;
         rect.y = y;
-        LoadImage(&rect, (u_long *)blendedClut);
+        LoadImage(&rect, (u32 *)blendedClut);
         DrawSync(0);
         SetDrawMove(&gCharFogMoves[0][step], &rect, 0, FOG_CHAR_CLUT_Y);
         gCharFogMoves[1][step] = gCharFogMoves[0][step];

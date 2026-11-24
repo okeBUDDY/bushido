@@ -4,6 +4,7 @@
 #include <libgte.h>
 #include <inline_o.h>
 #include <libgpu.h>
+#include "int32.h"
 #include "billboard.h"
 #include "gpu_code.h"
 #include "stage_id.h"
@@ -96,7 +97,7 @@ void SpawnGroundDecal(int uvIndex, int *position, int angle)
 
 int UpdateAndBuildGroundDecals(GroundDecalScratch *scratch)
 {
-    long depths[GROUND_DECAL_MAX];
+    s32 depths[GROUND_DECAL_MAX];
     POLY_FT4 *polys[GROUND_DECAL_MAX];
     struct GroundDecal *decal;
     POLY_FT4 *poly;
@@ -106,7 +107,7 @@ int UpdateAndBuildGroundDecals(GroundDecalScratch *scratch)
     int k;
     int shade;
     EffectTextureEntry *texture;
-    long *depthList;
+    s32 *depthList;
 
     texture = &gGroundDecalTexture;
     SetRotMatrix(&scratch->matrix);
@@ -150,7 +151,7 @@ int UpdateAndBuildGroundDecals(GroundDecalScratch *scratch)
             shade = decal->life;
             if (shade > GROUND_DECAL_FULL_SHADE)
                 shade = GROUND_DECAL_FULL_SHADE;
-            *(long *)&poly->r0 = GPU_CODE_WORD(GPU_CODE_POLY_FT4 | GPU_CODE_SEMITRANS) |
+            *(s32 *)&poly->r0 = GPU_CODE_WORD(GPU_CODE_POLY_FT4 | GPU_CODE_SEMITRANS) |
                 shade << 16 | shade << 8 | shade;
             gte_stotz(&depths[count++]);
             poly++;
@@ -158,7 +159,7 @@ int UpdateAndBuildGroundDecals(GroundDecalScratch *scratch)
     }
     /* Append deferred packet pointers and GTE OTZ depths immediately after the POLY_FT4s. */
     scratch->packets = poly;
-    depthList = (long *)poly + count;
+    depthList = (s32 *)poly + count;
     for (k = 0; k < count; k++)
         ((POLY_FT4 **)poly)[k] = polys[k];
     for (k = 0; k < count; k++)

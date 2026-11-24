@@ -6,6 +6,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <stdarg.h>
+#include "int32.h"
 #include "gpu_code.h"
 #include "packet_build.h"
 #include "model_arena.h"
@@ -800,11 +801,11 @@ void DrawHudBanner(int bannerIndex)
 }
 
 #ifdef VERSION_JP
-u_long gNowLoadingTim[560] = {
+u32 gNowLoadingTim[560] = {
 #include "content/now_loading_jp.inc"
 };
 #else
-u_long gNowLoadingTim[368] = {
+u32 gNowLoadingTim[368] = {
 #include "content/now_loading.inc"
 };
 #endif

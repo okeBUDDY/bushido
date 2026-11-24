@@ -4,6 +4,7 @@
 #include <libgte.h>
 #include <libetc.h>
 #include <libgpu.h>
+#include "int32.h"
 #include "scene_node.h"
 #include "light.h"
 #include "screen_fade.h"
@@ -99,7 +100,7 @@ typedef struct SelectCamSegment {
 
 static int gSelectGameMode;
 static int gSelectPhase;
-static unsigned long *gSelectPoseStream;
+static u32 *gSelectPoseStream;
 static unsigned char gSelectUnused[4]; /* 4 bytes; nothing reads or writes them */
 static int gSelectUnreadFlag; /* written, never read */
 static int gSelectCostumeBank;
@@ -139,7 +140,7 @@ char *InitCharacterSelectScene(int costumeLayout, int selectMode, char *mainCurs
     int twoPlayerMode;
     int defaultCharacterSlot;
     int defaultWeaponSlot;
-    unsigned long *poseStream;
+    u32 *poseStream;
 
     gSelectAuxParts = workBuffer;
     gSelectAuxShadows = workBuffer + SELECT_AUX_PART_COUNT;
@@ -173,7 +174,7 @@ char *InitCharacterSelectScene(int costumeLayout, int selectMode, char *mainCurs
         TriggerDebugTrap();
     }
     ReadCdFileSync(CD_FILE_SELECT_SCENE_DATA, auxCursor);
-    gSelectPoseStream = (unsigned long *)(auxCursor + ((SelectSceneArchiveHeader *)auxCursor)->poseStreamOffset);
+    gSelectPoseStream = (u32 *)(auxCursor + ((SelectSceneArchiveHeader *)auxCursor)->poseStreamOffset);
     gSelectCameraTrack = (SelectCameraKey *)(auxCursor + ((SelectSceneArchiveHeader *)auxCursor)->cameraTrackOffset);
     weaponModels = (int *)(auxCursor + ((SelectSceneArchiveHeader *)auxCursor)->weaponModelsOffset);
     handModels = (int *)(auxCursor + ((SelectSceneArchiveHeader *)auxCursor)->handModelsOffset);

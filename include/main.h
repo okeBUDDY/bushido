@@ -2,6 +2,7 @@
 #define MAIN_H
 
 #include <sys/types.h>
+#include "int32.h"
 #include "stage_tables.h"
 
 /* Horizontal blanks (RCntCNT1) a frame lasts at least: more than one field, so a frame takes two vertical
@@ -26,7 +27,7 @@ extern unsigned char *gSharedWorkBuffer;
 extern short gDisplayPresentEnabled;
 extern short gAllMenuModesEnabled;
 extern int gFrameCounter;
-extern u_long *gCurrentOt;
+extern u32 *gCurrentOt;
 
 void SetBackgroundClear(int clearBackground, int red, int green, int blue);
 void RunBootVersionState(void);

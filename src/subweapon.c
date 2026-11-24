@@ -8,6 +8,7 @@
 #include <memory.h>
 #include <inline_o.h>
 
+#include "int32.h"
 #include "angle.h"
 #include "combat_hit.h"
 #include "display_buffer.h"
@@ -33,8 +34,8 @@
 typedef struct SubWeaponTrailScratch {
     VECTOR cameraOrigin;
     SVECTOR verts[4];
-    long screenXY[2];
-    u_long otz;
+    s32 screenXY[2];
+    u32 otz;
 } SubWeaponTrailScratch;
 
 #define TRAIL_TPAGE_ADDITIVE          GET_TPAGE(0, 1, 0, 0)
@@ -82,8 +83,8 @@ static void DrawSubWeaponTrail(int slotIndex, SubWeaponSlot *slot, int trailRgb)
     int bufferIndex;
     int tipAngle;
     int weaponYaw;
-    u_long halfDepth;
-    u_long depthShift;
+    u32 halfDepth;
+    u32 depthShift;
 
     dx = slot->motion.prevPosition.x - slot->motion.position.x;
     dz = slot->motion.prevPosition.z - slot->motion.position.z;
@@ -124,17 +125,17 @@ static void DrawSubWeaponTrail(int slotIndex, SubWeaponSlot *slot, int trailRgb)
     scratch->verts[3].vy = slot->motion.prevPosition.y - scratch->cameraOrigin.vy;
     scratch->verts[3].vz = slot->motion.prevPosition.z - offsetZ + dz - scratch->cameraOrigin.vz;
     gte_stsxy3(&scratch->screenXY[0], &scratch->screenXY[1], &trailQuad->x2);
-    *(long *)&trailQuad->x0 = scratch->screenXY[0];
-    *(long *)&trailQuad->x1 = scratch->screenXY[1];
+    *(s32 *)&trailQuad->x0 = scratch->screenXY[0];
+    *(s32 *)&trailQuad->x1 = scratch->screenXY[1];
     gte_ldv0(&scratch->verts[3]);
     gte_rtps();
     trailRgb |= GPU_CODE_WORD(GPU_CODE_POLY_G4 | GPU_CODE_SEMITRANS);
-    *(long *)&trailQuad->r0 = trailRgb;
-    *(long *)&trailQuad->r1 = trailRgb;
+    *(s32 *)&trailQuad->r0 = trailRgb;
+    *(s32 *)&trailQuad->r1 = trailRgb;
     gte_stsxy(&trailQuad->x3);
     gte_avsz4();
-    *(long *)&trailQuad->r2 = 0;
-    *(long *)&trailQuad->r3 = 0;
+    *(s32 *)&trailQuad->r2 = 0;
+    *(s32 *)&trailQuad->r3 = 0;
     gte_stotz(&scratch->otz);
     /* Non-linear OTZ compression into 4096 ordering-table buckets. */
     halfDepth = scratch->otz >> 1;
@@ -167,9 +168,9 @@ static void DrawSubWeaponTrail(int slotIndex, SubWeaponSlot *slot, int trailRgb)
     gte_ldv3(&scratch->verts[2], &scratch->verts[3], &scratch->verts[3]);
     gte_rtpt();
     SetPolyF4(tipQuad);
-    *(long *)&tipQuad->x0 = scratch->screenXY[0];
-    *(long *)&tipQuad->x1 = scratch->screenXY[1];
-    *(long *)&tipQuad->r0 = (trailRgb & GPU_RGB_MASK) | GPU_CODE_WORD(GPU_CODE_POLY_F4 | GPU_CODE_SEMITRANS);
+    *(s32 *)&tipQuad->x0 = scratch->screenXY[0];
+    *(s32 *)&tipQuad->x1 = scratch->screenXY[1];
+    *(s32 *)&tipQuad->r0 = (trailRgb & GPU_RGB_MASK) | GPU_CODE_WORD(GPU_CODE_POLY_F4 | GPU_CODE_SEMITRANS);
     gte_stsxy3(&tipQuad->x2, &tipQuad->x3, &scratch->screenXY[0]);
     AddPrim(gCurrentOt + scratch->otz, tipQuad);
     SetDrawTPage(tpage, 0, 1, TRAIL_TPAGE_ADDITIVE);

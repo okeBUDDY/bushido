@@ -5,6 +5,7 @@
 #include <libetc.h>
 #include <libgpu.h>
 
+#include "int32.h"
 #include "gpu_code.h"
 #include "fighter_skeleton.h"
 #include "scene_node.h"
@@ -65,7 +66,7 @@ void UpdateAndDrawStageGroundDecals(void)
     GroundDecalScratch *scratch = (GroundDecalScratch *)getScratchAddr(8);
     int i, count, bucket;
     POLY_FT4 **packets;
-    long *depths;
+    s32 *depths;
 
     BuildNegatedNodeRotation(&gCameraNode);
     matrix = gCameraNode.worldMatrix;
@@ -81,7 +82,7 @@ void UpdateAndDrawStageGroundDecals(void)
     count = UpdateAndBuildGroundDecals(scratch);
     packets = (POLY_FT4 **)scratch->packets;
     gPacketCursor = packets;
-    depths = (long *)(packets + count);
+    depths = (s32 *)(packets + count);
     for (i = 0; i < count; i++) {
         bucket = CompressDepthToOtz(depths[i] * 4, 0);
         if (bucket > STAGE_TILE_NEAR_CLIP_OTZ && bucket < OTZ_BUCKET_COUNT) {

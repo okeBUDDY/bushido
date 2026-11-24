@@ -2,11 +2,12 @@
  * and 51 12-bit joint angles), each group of eight frames a key pose then second-order deltas, with
  * a four-slot cache of decoded frames and their bit-reader state. */
 
+#include "int32.h"
 #include "pose_stream.h"
 
 int gPoseReuseModes = 0; /* set while DecodePoseFramePair decodes its second frame */
 
-unsigned long *gPoseStreamBase;
+u32 *gPoseStreamBase;
 int gPoseCacheSerial;            /* serial of the last decode; picks the cache slot */
 PoseCache gPoseDecodeCache[POSE_CACHE_SLOTS];
 unsigned short gPoseChannelModes[POSE_TOTAL_COMPONENTS];
@@ -17,7 +18,7 @@ short gPoseDefaultPose[POSE_TOTAL_COMPONENTS];
 #define POSE_READ_BITS_WITH_PREFIX(dst, n, prefix) \
     if (left < (n)) { \
         int need = (n) - left; \
-        unsigned long bits = word >> (32 - left); \
+        u32 bits = word >> (32 - left); \
         word = *ptr++; \
         (dst) = (prefix) | ((bits << need) | (word >> (32 - need))); \
         left = 32 - need; \
@@ -49,11 +50,11 @@ short gPoseDefaultPose[POSE_TOTAL_COMPONENTS];
         } \
     }
 
-void InitPoseStream(unsigned long *stream)
+void InitPoseStream(u32 *stream)
 {
-    unsigned long *ptr;
+    u32 *ptr;
     int left;
-    unsigned long word;
+    u32 word;
     int component;
     int slot;
 
@@ -83,9 +84,9 @@ void DecodePoseFrame(int frame, void *output, PoseWork *work)
     unsigned char *directoryBytes;
     PoseCache *cached;
     PoseCache *prev;
-    unsigned long *ptr;
+    u32 *ptr;
     int left;
-    unsigned long word;
+    u32 word;
     int component;
     int deltaStep;
     int width;

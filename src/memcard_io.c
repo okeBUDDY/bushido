@@ -6,12 +6,13 @@
 #include <sys/file.h>
 #include <kernel.h>
 #include <stdio.h>
+#include "int32.h"
 #include "memcard_io.h"
 
 #define MEMORY_CARD_EVENT_POLL_LIMIT 120
 
-long ev0, ev1, ev2, ev3;     /* SwCARD */
-long ev10, ev11, ev12, ev13; /* HwCARD */
+s32 ev0, ev1, ev2, ev3;     /* SwCARD */
+s32 ev10, ev11, ev12, ev13; /* HwCARD */
 
 void InitMemoryCard(void)
 {
@@ -176,12 +177,12 @@ int MemoryCardHasFile(char *filename)
     return 0;
 }
 
-long fd;
+s32 fd;
 
-int StartMemoryCardRead(int port, int slot, char *filename, char *buffer, long size)
+int StartMemoryCardRead(int port, int slot, char *filename, char *buffer, s32 size)
 {
     char path[32];
-    long file;
+    s32 file;
 
     sprintf(path, "bu%1d%1d:%s", port, slot, filename);
     file = open(path, O_RDONLY | O_NOWAIT);
@@ -198,10 +199,10 @@ int StartMemoryCardRead(int port, int slot, char *filename, char *buffer, long s
     return 0;
 }
 
-int StartMemoryCardWrite(int port, int slot, char *filename, char *data, long blocks, long size, int create)
+int StartMemoryCardWrite(int port, int slot, char *filename, char *data, s32 blocks, s32 size, int create)
 {
     char path[32];
-    long file;
+    s32 file;
 
     sprintf(path, "bu%1d%1d:%s", port, slot, filename);
     if (create) {
@@ -232,7 +233,7 @@ int card_sts;
 
 int StepMemoryCardProbe(int port, int slot)
 {
-    long channel;
+    s32 channel;
     int event;
 
     channel = (port << 4) + slot;
