@@ -68,6 +68,17 @@ your copies of the four PsyQ kit releases (`PSYQ_3_6`, `PSYQ_3_3_DOS`, `PSYQ_3_5
 (plus `WIN32_RUNNER` off Windows), then run `sh build.sh`. It verifies every tool and SDK header by SHA-256,
 compiles all 12 libraries and 103 game units from source, links all three executables, and checks each SHA-256.
 
+```
+export PSYQ_3_6=/path/to/psyq-3.6 PSYQ_3_3_DOS=/path/to/psyq-3.3-dos
+export PSYQ_3_5_DOS=/path/to/psyq-3.5-dos PSYQ_3_6_DOS=/path/to/psyq-3.6-dos
+export ORIG_DIR=/path/to/your/executables DOS_RUNNER=/path/to/a/dos/runner
+sh build.sh
+```
+
+It needs only a POSIX shell with its standard utilities and `sha256sum` or `shasum`; `sh build.sh --help` lists
+every variable and option. A run that reproduces all three executables ends with
+`Verified 3 executable(s) cleanly.`; any input or result whose SHA-256 differs stops it with an error.
+
 ## Layout
 
 | Path | Holds |
